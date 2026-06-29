@@ -161,6 +161,26 @@ Before `CHK-SLENDERNESS-001` can move beyond `TODO_DOMAIN_VALIDATION`, an accept
 
 Until this fixture is approved, reports and optimizer output may mention the validation gap only. They must not emit slenderness compliance, pass/fail status, buckling capacity, column strength, or feasibility evidence.
 
+### Accepted-example evidence template
+
+The following shape defines the evidence that a future reviewer must supply. It is intentionally non-executable until every approval field is complete.
+
+| Field | Required content for an accepted example | Current value |
+|---|---|---|
+| Inputs | Member length basis; `K` if applicable; axis-specific `rx`/`ry` values; governing radius policy; member category; bracing/end conditions; compression applicability | not approved |
+| Units | Units for length, radius, and any conversion policy used by the expression | not approved |
+| Expression | Required semantic expression: `L/r`, `K·L/r`, or explicit `blocked-only`, with reviewer-owned source trace before implementation | `blocked-only` |
+| Intermediate values | Source-backed intermediate substitutions and calculations | not approved |
+| Expected result | Numeric result only after reviewer approval; no compliance outcome unless a source-backed limit is approved separately | not approved |
+| Tolerance / rationale | Numerical tolerance and rationale for software comparison, if the example later becomes a test fixture | not approved |
+| Trace ID | `CHK-SLENDERNESS-001` plus source clause trace ID(s) | not approved |
+| Source clause | Exact source, edition, clause/reference, and interpretation note | not approved |
+| Reviewer / date | Reviewer identity and ISO approval date | not approved |
+
+### Placeholder status
+
+`example_08_slenderness_effective_length_gate` is a non-accepted placeholder. It must not be converted into a Rust test, runtime fixture, report output, optimizer constraint, or implementation formula until reviewer-approved clauses, inputs, limits if any, expected values, reviewer identity, and ISO date are recorded.
+
 ## Failed-run examples
 
 Failed-run reports generated from singular, unstable, validation-error, or unsupported-rule examples must include:

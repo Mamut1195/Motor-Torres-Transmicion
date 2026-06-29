@@ -18,6 +18,21 @@ These questions protect the project from pretending that source inventory equals
 | Q-DOM-009 | What singularity threshold and conditioning policy will be accepted? | Yes, for solver | Numerical policy ADR/update before WU3. | open |
 | Q-DOM-010 | Which linear algebra crate will be used, and what are its failure modes? | Yes, before solver | Dependency decision in WU2/WU3 with license, determinism, and replacement cost. | open |
 
+### `CHK-SLENDERNESS-001` blocker checklist
+
+The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.
+
+| Blocker | Required resolution | Current status |
+|---|---|---|
+| Governing source clauses | Exact source, edition, clause/reference, interpretation note, and trace ID | open |
+| Semantic choice | Reviewer selects `L/r`, `K·L/r`, or explicit `blocked-only` | open; current gate remains `blocked-only` |
+| Limits and applicability | Source-backed limits, member categories, exclusions, and compression applicability | open |
+| Required inputs | Member length basis, `K` if applicable, axis radii policy, bracing/end-condition assumptions, units | open |
+| Accepted example | Inputs, expression, intermediate values, expected result, tolerance/rationale, trace ID, and clause | open |
+| Reviewer / date | Reviewer identity and ISO approval date covering the full evidence packet | open |
+
+Until all rows are resolved, `CHK-SLENDERNESS-001` stays `TODO_DOMAIN_VALIDATION` and blocked for source, schema, CLI, tests, reports, optimizer feasibility, and runtime behavior.
+
 ## Optimization Questions
 
 | ID | Question | Blocks Implementation? | Owner / Resolution Path | Current Status |

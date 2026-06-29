@@ -39,3 +39,17 @@ This map connects candidate references to MAMUT Tower Engine domains. It is an i
 4. Catalog files under `data/` are data inputs, not normative authority.
 5. Reports MUST expose assumptions, source/status, utilization, controlling case, and the disclaimer `not for final engineering design`.
 6. Slenderness/effective-length source inventory for `CHK-SLENDERNESS-001` is a research gate only. Until exact clauses, limits, examples, and reviewer approval are recorded in `formulas_register.md` and `validation_examples.md`, the engine must not emit slenderness compliance, pass/fail results, buckling capacity, column strength, or optimizer feasibility evidence.
+
+## `CHK-SLENDERNESS-001` Source Evidence Inventory
+
+This table is an inventory and review checklist. It does not approve a formula, limit, example, or implementation path. A listed source remains `candidate` until a reviewer records the exact clause/reference, interpretation, reviewer name, and ISO approval date in the downstream evidence ledger.
+
+| Source ID | Source / clause reference | Intended role | Evidence status | Reviewer / date | Notes |
+|---|---|---|---|---|---|
+| `SRC-ASCE-10-15-SLENDERNESS-CANDIDATE` | ASCE/SEI 10-15; exact slenderness/effective-length clause(s) not yet recorded | Primary candidate for tower-specific slenderness semantics, limits, applicability, and required input definitions | candidate | not approved | Inventory only. Required before implementation: exact clause(s), selected semantic choice, variables/units, limits if any, member category, compression applicability, and accepted example trace. |
+| `SRC-ASCE-10-15-K-AXIS-CANDIDATE` | ASCE/SEI 10-15; exact effective-length, axis radius, bracing, and end-condition references not yet recorded | Primary candidate for `K`, axis-specific radius policy, bracing/end-condition assumptions, and exclusions | candidate | not approved | Does not authorize use of `L/r` or `K·L/r`. Reviewer must decide whether `K` applies and which radius controls. |
+| `SRC-AISC-360-22-CONTEXT` | AISC 360-22; exact context clause(s) not recorded for this engine | Supporting steel-design context only | candidate | not approved | Context inventory must not override tower-specific criteria. It cannot approve transmission-tower slenderness limits by itself. |
+| `SRC-TIMOSHENKO-GERE-CONTEXT` | Timoshenko & Gere; exact theory reference not recorded for this engine | Background theory for stability/slenderness concepts | candidate | not approved | Context-only source. It can explain concepts but cannot approve project limits, member-category rules, or compliance output. |
+| `SRC-CHK-SLENDERNESS-APPROVAL` | Reviewer-owned source packet with exact clauses, examples, and interpretation | Approval record required before any future runtime/test/report/optimizer work | blocked | not approved | Blocked because reviewer-approved clauses, semantic choice, limits, accepted examples, reviewer identity, and ISO date are not present. |
+
+Approval rule: candidate source inventory is not approval. `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION` until the approval record provides reviewer-owned clauses, interpretation, variables/units, limits if any, accepted numeric example(s), reviewer, and ISO date.

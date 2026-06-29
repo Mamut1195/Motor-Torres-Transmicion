@@ -48,6 +48,20 @@ Before any implementation can be approved, the domain gate must record:
 - accepted numeric examples with trace IDs and reviewer/date; and
 - explicit wording that no slenderness pass/fail, code compliance, buckling capacity, column strength, or final engineering design claim is allowed while the status is `TODO_DOMAIN_VALIDATION`, `pending`, or `provisional`.
 
+#### `CHK-SLENDERNESS-001` compact evidence record
+
+| Evidence field | Required value before approval | Current value | Gate state |
+|---|---|---|---|
+| Semantic choice | Exactly one of `L/r`, `K·L/r`, or explicit `blocked-only`, with clause trace and reviewer/date | `blocked-only` because no reviewer-owned semantic approval is recorded | blocked |
+| Governing clause(s) | Exact source ID, edition, clause/reference, interpretation note, and trace ID | Candidate inventory exists in `standards_map.md`; exact approved clause(s) are unavailable | blocked |
+| Variables and units | Member length basis, radius/radii units, `K` if applicable, and conversion policy | Required fields are identified, but no approved values or unit policy are recorded | blocked |
+| Required inputs | Length basis, `K`, axis-specific radii (`rx`, `ry`, minor/governing policy), bracing/end conditions, member category, and compression applicability | Inputs remain unresolved and must stay visible in `open_questions.md` | blocked |
+| Limits and applicability | Source-backed limit(s), exclusions, member categories, and whether any threshold supports later reporting | No approved limit or applicability rule exists; no compliance threshold may be inferred | blocked |
+| Accepted numeric example | Inputs, expression, intermediate values, result, tolerance/rationale, trace ID, clause, reviewer, and ISO date | `example_08_slenderness_effective_length_gate` is a non-accepted template only | blocked |
+| Reviewer approval | Reviewer identity plus ISO approval date for clauses, semantic choice, limits, and example | not approved | blocked |
+
+Current documentation state: `blocked-only`. This is a guardrail, not an approved runtime formula. It intentionally prevents source, schema, CLI, test, reporting, optimizer, or runtime behavior from depending on unapproved slenderness semantics.
+
 ## Source-to-test traceability convention
 
 - Formula/register IDs must appear in tests and report traces once formulas exist.

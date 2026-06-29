@@ -90,6 +90,20 @@ For `CHK-SLENDERNESS-001`, blocked status includes any state where the approved 
 
 Until every item is accepted, documentation may describe only the gap and required evidence. Runtime, schema, CLI, test, or source-code changes for slenderness remain out of scope for this gate.
 
+### `CHK-SLENDERNESS-001` non-runtime approval guard
+
+This docs-only evidence package does not approve or implement slenderness behavior. Source inventory, context references, placeholder examples, and unchecked gate items are not approval evidence.
+
+| Guard item | Required approval evidence | Current state |
+|---|---|---|
+| Formula semantics | Reviewer-approved choice of `L/r`, `K·L/r`, or explicit `blocked-only`, with exact clause trace | blocked-only; not approved for implementation |
+| Clauses and limits | Exact source, edition, clause/reference, interpretation, limits if any, reviewer, and ISO date | blocked; unavailable |
+| Inputs and units | Member length basis, `K` policy, axis radii, bracing/end conditions, member category, compression applicability, units, exclusions | blocked; unresolved |
+| Accepted example | Inputs, units, expression, intermediate values, result, tolerance/rationale, trace ID, source clause, reviewer, and ISO date | blocked; placeholder only |
+| Runtime authorization | Explicit future SDD scope after evidence approval | blocked; no source, schema, CLI, Rust, tests, reporting, optimizer, or runtime behavior is allowed here |
+
+Acceptance rule for this check: no acceptance checkbox or status may close unless reviewer identity and ISO date evidence are present for the full source-backed packet. Until then, `CHK-SLENDERNESS-001` may be mentioned only as an unresolved validation gap and must not support compliance, pass/fail, feasibility, buckling, column-strength, or final-design claims.
+
 ## Pre-WU3 gate
 
 WU3 may start only after the reviewer accepts the following documentation set:
