@@ -114,6 +114,12 @@ This fixture validates only member self-weight quantity tracing. It is not a nor
 
 Proof note: `crates/tower-core/tests/design_checks.rs` references `example_05_member_weight_quantity` and `QTY-WEIGHT-001`. Normative tension, compression, slenderness, and displacement checks remain blocked as `TODO_DOMAIN_VALIDATION` until approved formula-register entries and tests exist.
 
+### Minimum Load Model v1 reporting use
+
+Status: `validated_quantity` evidence only; not for final engineering design.
+
+`QTY-WEIGHT-001` may appear in load-model evidence reports as source-backed member self-weight quantity provenance. It must not create self-weight nodal loads, wind loads, conductor loads, load combinations, load factors, or code-compliant loading results. Missing lumping/modeling assumptions remain `TODO_DOMAIN_VALIDATION`.
+
 ## Preliminary axial stress utilization fixtures: `example_06` and `example_07`
 
 Status: independently proven in validated-member-checks-v1 Strict TDD tests.

@@ -30,6 +30,16 @@
 
 Future code must reference formula IDs in tests and report traces. Unsupported rules must remain visible as `TODO_DOMAIN_VALIDATION`.
 
+## Minimum Load Model v1 Evidence Boundary
+
+This boundary is not for final engineering design. It separates accepted input evidence from blocked loading categories.
+
+| Evidence | Runtime status | Source | Allowed use | Blocked use |
+|---|---|---|---|---|
+| Explicit nodal load cases | `explicit_user_input` | User-provided TOML `load_cases` records | Parse, validate node references, preserve `kN` force components, and show status/source in reports. | Treating placeholder loads as code-compliant wind, conductor, combination, factor, or final-design loading. |
+| `QTY-WEIGHT-001` member self-weight quantity | `validated_quantity` | Formula register plus `CheckRule::TotalWeight` trace | Report as non-normative quantity evidence. | Converting the quantity into generated nodal loads without reviewer-approved lumping/modeling assumptions. |
+| Wind, conductor, load combinations, load factors, displacement/design-level loading | `TODO_DOMAIN_VALIDATION` | No reviewer-approved clauses/examples recorded | Surface as blocked report evidence. | Emitting pass/fail compliance, code-compliant loading, or final engineering design claims. |
+
 The `NUM-AXIAL-*` entries are numerical validation formulas/methods for software tests only. Their WU3 validation status does not make them normative design rules, and they must not be presented as final engineering design acceptance criteria.
 
 The `QTY-WEIGHT-001` entry is a non-normative quantity trace for software-level preliminary reporting. It does not validate member strength, load combinations, or final engineering design acceptance.

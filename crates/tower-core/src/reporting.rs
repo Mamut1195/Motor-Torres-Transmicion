@@ -1,5 +1,6 @@
 use crate::design_checks::{CheckResult, CheckStatus, FormulaStatus};
 use crate::errors::TowerError;
+use crate::loads::{LoadCase, LoadProvenanceStatus};
 use crate::optimization::OptimizationResult;
 
 pub const ENGINEERING_DISCLAIMER: &str = "not for final engineering design";
@@ -8,6 +9,84 @@ pub const ENGINEERING_DISCLAIMER: &str = "not for final engineering design";
 pub struct PreliminaryReport {
     title: String,
     lines: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LoadEvidence {
+    id: String,
+    label: String,
+    status: LoadProvenanceStatus,
+    source: String,
+    note: String,
+}
+
+impl LoadEvidence {
+    pub fn explicit_load_case(load_case: &LoadCase) -> Self {
+        Self {
+            id: load_case.id.0.clone(),
+            label: "explicit nodal load case".to_string(),
+            status: load_case.status,
+            source: load_case.source.clone(),
+            note: format!(
+                "nodal loads: {} explicit user input record(s)",
+                load_case.nodal_loads.len()
+            ),
+        }
+    }
+
+    pub fn validated_quantity(
+        id: impl Into<String>,
+        label: impl Into<String>,
+        source: impl Into<String>,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            label: label.into(),
+            status: LoadProvenanceStatus::ValidatedQuantity,
+            source: source.into(),
+            note: "No generated nodal loads are created from this evidence.".to_string(),
+        }
+    }
+
+    pub fn todo_domain_validation(label: impl Into<String>, reason: impl Into<String>) -> Self {
+        let label = label.into();
+        Self {
+            id: label.clone(),
+            label,
+            status: LoadProvenanceStatus::TodoDomainValidation,
+            source: "blocked pending reviewer-approved evidence".to_string(),
+            note: reason.into(),
+        }
+    }
+}
+
+pub fn blocked_load_model_evidence() -> Vec<LoadEvidence> {
+    vec![
+        LoadEvidence::todo_domain_validation(
+            "self-weight to nodal load generation",
+            "blocked until a reviewer-approved lumping/modeling assumption exists",
+        ),
+        LoadEvidence::todo_domain_validation(
+            "wind loads",
+            "blocked until reviewer-approved wind loading clauses and assumptions exist",
+        ),
+        LoadEvidence::todo_domain_validation(
+            "conductor loads",
+            "blocked until reviewer-approved conductor loading clauses and assumptions exist",
+        ),
+        LoadEvidence::todo_domain_validation(
+            "load combinations",
+            "blocked until reviewer-approved load combination rules exist",
+        ),
+        LoadEvidence::todo_domain_validation(
+            "load factors",
+            "blocked until reviewer-approved load factor rules exist",
+        ),
+        LoadEvidence::todo_domain_validation(
+            "displacement or design-level loading",
+            "blocked until reviewer-approved serviceability/design loading evidence exists",
+        ),
+    ]
 }
 
 impl PreliminaryReport {
@@ -71,6 +150,31 @@ impl PreliminaryReport {
         lines.push("Failure details:".to_string());
         lines.push(format!("- {error}"));
         lines.push("This is not final-design approval.".to_string());
+        Self {
+            title: lines[0].clone(),
+            lines,
+        }
+    }
+
+    pub fn from_load_evidence(title: impl Into<String>, evidence: &[LoadEvidence]) -> Self {
+        let mut lines = base_lines(title.into(), "Completed load evidence report");
+        lines.push("This report does not establish code compliance.".to_string());
+        lines.push("Load model evidence:".to_string());
+        if evidence.is_empty() {
+            lines.push("- No load evidence records were provided.".to_string());
+        } else {
+            for record in evidence {
+                lines.push(format!(
+                    "- {}: {} [{}]; source: {}; {}",
+                    record.id,
+                    record.label,
+                    load_status_label(record.status),
+                    record.source,
+                    record.note
+                ));
+            }
+        }
+
         Self {
             title: lines[0].clone(),
             lines,
@@ -163,5 +267,14 @@ fn formula_status_label(status: FormulaStatus) -> &'static str {
         FormulaStatus::Pending => "PENDING",
         FormulaStatus::Provisional => "PROVISIONAL",
         FormulaStatus::TodoDomainValidation => "TODO_DOMAIN_VALIDATION",
+    }
+}
+
+fn load_status_label(status: LoadProvenanceStatus) -> &'static str {
+    match status {
+        LoadProvenanceStatus::ExplicitUserInput => "explicit_user_input",
+        LoadProvenanceStatus::ValidatedQuantity => "validated_quantity",
+        LoadProvenanceStatus::CandidateProvisional => "candidate_provisional",
+        LoadProvenanceStatus::TodoDomainValidation => "TODO_DOMAIN_VALIDATION",
     }
 }

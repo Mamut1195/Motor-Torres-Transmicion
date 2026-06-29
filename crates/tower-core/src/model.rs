@@ -113,7 +113,10 @@ impl RawTowerModel {
             .load_cases
             .iter()
             .map(RawLoadCase::validate)
-            .collect::<Result<Vec<_>>>()?;
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
         ensure_unique(
             load_cases.iter().map(|load_case| load_case.id.0.as_str()),
             "load_cases",
@@ -187,7 +190,10 @@ fn validate_references(
         )?;
     }
 
-    for LoadCase { id, nodal_loads } in load_cases {
+    for LoadCase {
+        id, nodal_loads, ..
+    } in load_cases
+    {
         validate_load_references(id, nodal_loads, &node_ids)?;
     }
 

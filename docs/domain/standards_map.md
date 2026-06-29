@@ -40,6 +40,18 @@ This map connects candidate references to MAMUT Tower Engine domains. It is an i
 5. Reports MUST expose assumptions, source/status, utilization, controlling case, and the disclaimer `not for final engineering design`.
 6. Slenderness/effective-length source inventory for `CHK-SLENDERNESS-001` is a research gate only. Until exact clauses, limits, examples, and reviewer approval are recorded in `formulas_register.md` and `validation_examples.md`, the engine must not emit slenderness compliance, pass/fail results, buckling capacity, column strength, or optimizer feasibility evidence.
 
+## Minimum Load Model v1 Source Handling
+
+This section is not for final engineering design. It records how reporting may describe load evidence without approving load generation.
+
+| Load evidence area | Candidate source status | Engine handling |
+|---|---|---|
+| Explicit nodal loads supplied in TOML | User input, not a standard-derived loading model | Report as `explicit_user_input` with source text; preserve force values only. |
+| `QTY-WEIGHT-001` self-weight quantity | Validated software quantity trace | Report as `validated_quantity`; do not generate nodal loads from it. |
+| Wind and conductor loads | Candidate sources only; no approved clauses/examples | Report as `TODO_DOMAIN_VALIDATION` if mentioned. |
+| Load combinations and factors | Candidate sources only; no approved combinations/factors | Report as `TODO_DOMAIN_VALIDATION`; do not infer combinations or factors. |
+| Displacement/design-level loading | Unapproved for the load-model slice | Report as `TODO_DOMAIN_VALIDATION`; do not emit final-design claims. |
+
 ## `CHK-SLENDERNESS-001` Source Evidence Inventory
 
 This table is an inventory and review checklist. It does not approve a formula, limit, example, or implementation path. A listed source remains `candidate` until a reviewer records the exact clause/reference, interpretation, reviewer name, and ISO approval date in the downstream evidence ledger.

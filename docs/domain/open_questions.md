@@ -18,6 +18,18 @@ These questions protect the project from pretending that source inventory equals
 | Q-DOM-009 | What singularity threshold and conditioning policy will be accepted? | Yes, for solver | Numerical policy ADR/update before WU3. | open |
 | Q-DOM-010 | Which linear algebra crate will be used, and what are its failure modes? | Yes, before solver | Dependency decision in WU2/WU3 with license, determinism, and replacement cost. | open |
 
+## Minimum Load Model v1 Blocking Questions
+
+These questions remain open and must be reported as `TODO_DOMAIN_VALIDATION` until reviewer-approved evidence exists. This boundary is not for final engineering design.
+
+| ID | Question | Current reporting status |
+|---|---|---|
+| Q-LOAD-001 | What approved lumping/modeling assumption converts `QTY-WEIGHT-001` member self-weight quantity into nodal loads? | `TODO_DOMAIN_VALIDATION`; no generated self-weight nodal loads. |
+| Q-LOAD-002 | Which exact wind-loading clauses, inputs, exposure assumptions, and examples are approved? | `TODO_DOMAIN_VALIDATION`; no wind loading behavior. |
+| Q-LOAD-003 | Which conductor loading assumptions and source-backed examples are approved? | `TODO_DOMAIN_VALIDATION`; no conductor loading behavior. |
+| Q-LOAD-004 | Which load combinations and load factors are approved for MVP reports? | `TODO_DOMAIN_VALIDATION`; no combinations or factors. |
+| Q-LOAD-005 | Which displacement or design-level loading criteria are approved? | `TODO_DOMAIN_VALIDATION`; no final-design loading claim. |
+
 ### `CHK-SLENDERNESS-001` blocker checklist
 
 The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.

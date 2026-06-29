@@ -2,6 +2,10 @@
 
 [[load_cases]]
 id = "placeholder_service_load"
+# Load provenance: explicit user input only. Normative self-weight, wind,
+# conductor, combination, and factor generation remain TODO_DOMAIN_VALIDATION.
+status = "explicit_user_input"
+source = "explicit placeholder user input; not for final engineering design"
 
 [[load_cases.nodal_loads]]
 node_id = "top_node"

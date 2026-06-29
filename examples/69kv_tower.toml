@@ -96,6 +96,10 @@ uz = true
 
 [[load_cases]]
 id = "placeholder_wind"
+# Load provenance: explicit user input only. This placeholder is not a
+# source-backed wind model, load combination, load factor, or final-design load.
+status = "explicit_user_input"
+source = "explicit placeholder user input; not for final engineering design"
 
 [[load_cases.nodal_loads]]
 node_id = "top"

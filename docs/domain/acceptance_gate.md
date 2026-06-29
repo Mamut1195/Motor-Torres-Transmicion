@@ -76,6 +76,22 @@ The following remain blocked and must not emit pass/fail engineering compliance 
 
 For `CHK-SLENDERNESS-001`, blocked status includes any state where the approved quantity, source clauses, limits, required inputs, accepted examples, or reviewer approval are missing. Blocked/provisional slenderness must not be counted as report compliance, pass/fail evidence, optimizer feasibility evidence, buckling capacity, column strength, or final engineering design evidence.
 
+## Minimum Load Model v1 gate update
+
+This reporting and documentation boundary is not for final engineering design.
+
+| Evidence category | Accepted status | Gate decision |
+|---|---|---|
+| Explicit user-provided nodal load cases | `explicit_user_input` | Accepted only as traceable user input with visible source/status. Force values are preserved; no normative loading claim is made. |
+| `QTY-WEIGHT-001` member self-weight quantity | `validated_quantity` | Accepted only as non-normative quantity evidence. It must not generate nodal loads without approved lumping/modeling assumptions. |
+| Self-weight nodal load generation | `TODO_DOMAIN_VALIDATION` | Blocked. |
+| Wind loads | `TODO_DOMAIN_VALIDATION` | Blocked. |
+| Conductor loads | `TODO_DOMAIN_VALIDATION` | Blocked. |
+| Load combinations and load factors | `TODO_DOMAIN_VALIDATION` | Blocked. |
+| Displacement or design-level loading | `TODO_DOMAIN_VALIDATION` | Blocked. |
+
+Acceptance rule: reports may expose status/source evidence and blocked categories only. They must not emit code-compliant loading behavior, load combinations/factors, generated self-weight nodal loads, wind/conductor loading, or final engineering design claims.
+
 ## `CHK-SLENDERNESS-001` research gate
 
 `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION`. A future implementation request must be rejected or deferred unless all gate items below are complete:

@@ -4,6 +4,14 @@ use crate::errors::Result;
 use crate::geometry::NodeId;
 use crate::units::{ForceKilonewtons, UnitValue};
 
+fn default_load_provenance_status() -> LoadProvenanceStatus {
+    LoadProvenanceStatus::ExplicitUserInput
+}
+
+fn default_load_source() -> String {
+    "user input".to_string()
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 pub struct LoadCaseId(pub String);
 
@@ -15,15 +23,33 @@ pub struct NodalLoad {
     pub fz: ForceKilonewtons,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+pub enum LoadProvenanceStatus {
+    #[serde(rename = "explicit_user_input")]
+    ExplicitUserInput,
+    #[serde(rename = "validated_quantity")]
+    ValidatedQuantity,
+    #[serde(rename = "candidate_provisional")]
+    CandidateProvisional,
+    #[serde(rename = "TODO_DOMAIN_VALIDATION")]
+    TodoDomainValidation,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct LoadCase {
     pub id: LoadCaseId,
     pub nodal_loads: Vec<NodalLoad>,
+    pub status: LoadProvenanceStatus,
+    pub source: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct RawLoadCase {
     pub id: String,
+    #[serde(default = "default_load_provenance_status")]
+    pub status: LoadProvenanceStatus,
+    #[serde(default = "default_load_source")]
+    pub source: String,
     #[serde(default)]
     pub nodal_loads: Vec<RawNodalLoad>,
 }
@@ -37,15 +63,21 @@ pub struct RawNodalLoad {
 }
 
 impl RawLoadCase {
-    pub fn validate(&self) -> Result<LoadCase> {
-        Ok(LoadCase {
+    pub fn validate(&self) -> Result<Option<LoadCase>> {
+        if self.status != LoadProvenanceStatus::ExplicitUserInput {
+            return Ok(None);
+        }
+
+        Ok(Some(LoadCase {
             id: LoadCaseId(self.id.clone()),
+            status: self.status,
+            source: self.source.clone(),
             nodal_loads: self
                 .nodal_loads
                 .iter()
                 .map(|load| load.validate(&self.id))
                 .collect::<Result<Vec<_>>>()?,
-        })
+        }))
     }
 }
 

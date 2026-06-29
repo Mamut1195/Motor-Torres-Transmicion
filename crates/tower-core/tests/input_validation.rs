@@ -1,4 +1,5 @@
 use tower_core::errors::TowerError;
+use tower_core::loads::LoadProvenanceStatus;
 use tower_core::model::TowerModel;
 
 fn valid_model_toml() -> String {
@@ -92,6 +93,94 @@ fn accepts_minimal_model_with_explicit_units() {
 
     assert_eq!(model.nodes.len(), 2);
     assert_eq!(model.members.len(), 1);
+}
+
+#[test]
+fn defaults_existing_nodal_load_cases_to_explicit_user_input() {
+    let model = TowerModel::from_toml_str(&valid_model_toml()).unwrap();
+
+    assert_eq!(model.load_cases.len(), 1);
+    assert_eq!(model.load_cases[0].id.0, "wind");
+    assert_eq!(
+        model.load_cases[0].status,
+        LoadProvenanceStatus::ExplicitUserInput
+    );
+    assert_eq!(model.load_cases[0].source, "user input");
+    assert_eq!(model.load_cases[0].nodal_loads.len(), 1);
+    assert_eq!(model.load_cases[0].nodal_loads[0].node_id.0, "n2");
+    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
+    assert_eq!(model.load_cases[0].nodal_loads[0].fy.get(), 0.0);
+    assert_eq!(model.load_cases[0].nodal_loads[0].fz.get(), 0.0);
+}
+
+#[test]
+fn preserves_explicit_load_case_provenance_when_provided() {
+    let input = valid_model_toml().replace(
+        "id = \"wind\"",
+        "id = \"wind\"\nstatus = \"explicit_user_input\"\nsource = \"field survey import\"",
+    );
+
+    let model = TowerModel::from_toml_str(&input).unwrap();
+
+    assert_eq!(model.load_cases.len(), 1);
+    assert_eq!(
+        model.load_cases[0].status,
+        LoadProvenanceStatus::ExplicitUserInput
+    );
+    assert_eq!(model.load_cases[0].source, "field survey import");
+    assert_eq!(model.load_cases[0].nodal_loads[0].node_id.0, "n2");
+    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
+}
+
+#[test]
+fn keeps_non_explicit_load_statuses_out_of_solver_load_cases() {
+    let mut input = valid_model_toml();
+    input.push_str(
+        r#"
+[[load_cases]]
+id = "self-weight-quantity"
+status = "validated_quantity"
+source = "QTY-WEIGHT-001"
+
+[[load_cases.nodal_loads]]
+node_id = "n2"
+fx = { value = 9.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = 0.0, unit = "kN" }
+
+[[load_cases]]
+id = "placeholder-wind"
+status = "candidate_provisional"
+source = "demo placeholder"
+
+[[load_cases.nodal_loads]]
+node_id = "n2"
+fx = { value = 8.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = 0.0, unit = "kN" }
+
+[[load_cases]]
+id = "blocked-conductor"
+status = "TODO_DOMAIN_VALIDATION"
+source = "pending reviewer-approved evidence"
+
+[[load_cases.nodal_loads]]
+node_id = "n2"
+fx = { value = 7.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = 0.0, unit = "kN" }
+"#,
+    );
+
+    let model = TowerModel::from_toml_str(&input).unwrap();
+
+    assert_eq!(model.load_cases.len(), 1);
+    assert_eq!(model.load_cases[0].id.0, "wind");
+    assert_eq!(
+        model.load_cases[0].status,
+        LoadProvenanceStatus::ExplicitUserInput
+    );
+    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
 }
 
 #[test]
