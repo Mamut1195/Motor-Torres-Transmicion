@@ -1,0 +1,61 @@
+# Non-normative optimization demo input for deterministic parser/example coverage only.
+[metadata]
+name = "example_04_optimization_demo"
+disclaimer = "not for final engineering design"
+
+[[nodes]]
+id = "fixed"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[nodes]]
+id = "free"
+point.x = { value = 3.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[materials]]
+id = "demo-steel"
+density = { value = 7850.0, unit = "kg/m3" }
+yield_stress = { value = 250.0, unit = "MPa" }
+elastic_modulus = { value = 200000000.0, unit = "kN/m2" }
+
+[[sections]]
+id = "light-demo"
+material_id = "demo-steel"
+nominal_area = { value = 0.0008, unit = "m2" }
+radius_of_gyration = { value = 0.018, unit = "m" }
+
+[[sections]]
+id = "heavy-demo"
+material_id = "demo-steel"
+nominal_area = { value = 0.0012, unit = "m2" }
+radius_of_gyration = { value = 0.024, unit = "m" }
+
+[[members]]
+id = "demo-member"
+start = "fixed"
+end = "free"
+section_id = "light-demo"
+
+[[supports]]
+node_id = "fixed"
+ux = true
+uy = true
+uz = true
+
+[[supports]]
+node_id = "free"
+ux = false
+uy = true
+uz = true
+
+[[load_cases]]
+id = "demo_axial"
+
+[[load_cases.nodal_loads]]
+node_id = "free"
+fx = { value = 8.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = 0.0, unit = "kN" }

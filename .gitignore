@@ -1,0 +1,4 @@
+.atl/
+.codegraph/
+docs/domain/*.pdf
+target/

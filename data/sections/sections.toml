@@ -1,0 +1,7 @@
+# Input data scaffold only; not normative authority.
+
+[[sections]]
+id = "L_placeholder"
+material_id = "steel_placeholder"
+nominal_area = { value = 0.001, unit = "m2" }
+radius_of_gyration = { value = 0.02, unit = "m" }

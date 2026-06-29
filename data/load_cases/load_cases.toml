@@ -1,0 +1,10 @@
+# Input data scaffold only; normative load combinations remain blocked.
+
+[[load_cases]]
+id = "placeholder_service_load"
+
+[[load_cases.nodal_loads]]
+node_id = "top_node"
+fx = { value = 0.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = -1.0, unit = "kN" }

@@ -1,0 +1,5 @@
+# Input data scaffold only; not for final engineering design.
+
+[[templates]]
+id = "placeholder_69kv_tower"
+description = "Placeholder for future validated 69 kV tower input."

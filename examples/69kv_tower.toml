@@ -1,0 +1,104 @@
+# Placeholder geometry and loads for deterministic software flow only.
+# Values are non-normative and are not for final engineering design.
+[metadata]
+name = "example_03_69kv_tower_placeholder"
+disclaimer = "not for final engineering design"
+
+[[nodes]]
+id = "base-left"
+point.x = { value = -2.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[nodes]]
+id = "base-right"
+point.x = { value = 2.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[nodes]]
+id = "body-mid"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 10.0, unit = "m" }
+
+[[nodes]]
+id = "top"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 18.0, unit = "m" }
+
+[[nodes]]
+id = "crossarm-left"
+point.x = { value = -4.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 14.0, unit = "m" }
+
+[[nodes]]
+id = "crossarm-right"
+point.x = { value = 4.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 14.0, unit = "m" }
+
+[[materials]]
+id = "placeholder-steel"
+density = { value = 7850.0, unit = "kg/m3" }
+yield_stress = { value = 250.0, unit = "MPa" }
+elastic_modulus = { value = 200000000.0, unit = "kN/m2" }
+
+[[sections]]
+id = "placeholder-angle"
+material_id = "placeholder-steel"
+nominal_area = { value = 0.002, unit = "m2" }
+radius_of_gyration = { value = 0.025, unit = "m" }
+
+[[members]]
+id = "left-leg"
+start = "base-left"
+end = "body-mid"
+section_id = "placeholder-angle"
+
+[[members]]
+id = "right-leg"
+start = "base-right"
+end = "body-mid"
+section_id = "placeholder-angle"
+
+[[members]]
+id = "body-top"
+start = "body-mid"
+end = "top"
+section_id = "placeholder-angle"
+
+[[members]]
+id = "left-crossarm"
+start = "body-mid"
+end = "crossarm-left"
+section_id = "placeholder-angle"
+
+[[members]]
+id = "right-crossarm"
+start = "body-mid"
+end = "crossarm-right"
+section_id = "placeholder-angle"
+
+[[supports]]
+node_id = "base-left"
+ux = true
+uy = true
+uz = true
+
+[[supports]]
+node_id = "base-right"
+ux = true
+uy = true
+uz = true
+
+[[load_cases]]
+id = "placeholder_wind"
+
+[[load_cases.nodal_loads]]
+node_id = "top"
+fx = { value = 5.0, unit = "kN" }
+fy = { value = 0.0, unit = "kN" }
+fz = { value = -2.0, unit = "kN" }

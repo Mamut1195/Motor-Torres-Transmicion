@@ -1,0 +1,84 @@
+[metadata]
+name = "example_02_simple_3d_truss_star"
+disclaimer = "not for final engineering design"
+
+[[nodes]]
+id = "support-x"
+point.x = { value = -1.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[nodes]]
+id = "support-y"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = -1.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[nodes]]
+id = "support-z"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = -1.0, unit = "m" }
+
+[[nodes]]
+id = "free"
+point.x = { value = 0.0, unit = "m" }
+point.y = { value = 0.0, unit = "m" }
+point.z = { value = 0.0, unit = "m" }
+
+[[materials]]
+id = "steel"
+density = { value = 7850.0, unit = "kg/m3" }
+yield_stress = { value = 250.0, unit = "MPa" }
+elastic_modulus = { value = 200000000.0, unit = "kN/m2" }
+
+[[sections]]
+id = "bar"
+material_id = "steel"
+nominal_area = { value = 0.001, unit = "m2" }
+radius_of_gyration = { value = 0.02, unit = "m" }
+
+[[members]]
+id = "x-bar"
+start = "support-x"
+end = "free"
+section_id = "bar"
+
+[[members]]
+id = "y-bar"
+start = "support-y"
+end = "free"
+section_id = "bar"
+
+[[members]]
+id = "z-bar"
+start = "support-z"
+end = "free"
+section_id = "bar"
+
+[[supports]]
+node_id = "support-x"
+ux = true
+uy = true
+uz = true
+
+[[supports]]
+node_id = "support-y"
+ux = true
+uy = true
+uz = true
+
+[[supports]]
+node_id = "support-z"
+ux = true
+uy = true
+uz = true
+
+[[load_cases]]
+id = "wind"
+
+[[load_cases.nodal_loads]]
+node_id = "free"
+fx = { value = 10.0, unit = "kN" }
+fy = { value = 20.0, unit = "kN" }
+fz = { value = 30.0, unit = "kN" }

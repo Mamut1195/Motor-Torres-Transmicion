@@ -1,0 +1,6 @@
+# Input data scaffold only; not normative authority.
+
+[[materials]]
+id = "steel_placeholder"
+density = { value = 7850.0, unit = "kg/m3" }
+yield_stress = { value = 250.0, unit = "MPa" }
