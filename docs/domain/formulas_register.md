@@ -37,12 +37,12 @@ This boundary is not for final engineering design. It separates accepted input e
 | Evidence | Runtime status | Source | Allowed use | Blocked use |
 |---|---|---|---|---|
 | Explicit nodal load cases | `explicit_user_input` | User-provided TOML `load_cases` records | Parse, validate node references, preserve `kN` force components, and show status/source in reports. | Treating placeholder loads as code-compliant wind, conductor, combination, factor, or final-design loading. |
-| `QTY-WEIGHT-001` member self-weight quantity | `validated_quantity` | Formula register plus `CheckRule::TotalWeight` trace | Report as non-normative quantity evidence. | Converting the quantity into generated nodal loads without reviewer-approved lumping/modeling assumptions. |
+| `QTY-WEIGHT-001` member self-weight quantity | `validated_quantity` | Formula register plus `CheckRule::TotalWeight` trace | Report as non-normative quantity evidence only. | Treating the quantity as a nodal distribution rule, load-generation rule, or approval to create generated nodal loads without reviewer-approved lumping/modeling assumptions. |
 | Wind, conductor, load combinations, load factors, displacement/design-level loading | `TODO_DOMAIN_VALIDATION` | No reviewer-approved clauses/examples recorded | Surface as blocked report evidence. | Emitting pass/fail compliance, code-compliant loading, or final engineering design claims. |
 
 The `NUM-AXIAL-*` entries are numerical validation formulas/methods for software tests only. Their WU3 validation status does not make them normative design rules, and they must not be presented as final engineering design acceptance criteria.
 
-The `QTY-WEIGHT-001` entry is a non-normative quantity trace for software-level preliminary reporting. It does not validate member strength, load combinations, or final engineering design acceptance.
+The `QTY-WEIGHT-001` entry is a non-normative quantity trace for software-level preliminary reporting. It does not validate member strength, load combinations, nodal distribution, load generation, or final engineering design acceptance.
 
 The `CHK-TENSION-001` and `CHK-COMPRESSION-001` entries validate only preliminary axial stress utilization from solved member axial force, nominal section area, and material yield stress. They do not validate buckling, slenderness, displacement, load combinations, connection checks, or final engineering design acceptance.
 
@@ -52,13 +52,34 @@ This register separates source inventory from approval. Rows below are not appro
 
 | ID | Load topic | Candidate formula / rule | Status | Required approval evidence |
 |---|---|---|---|---|
-| `LOAD-SW-DIST-001` | Self-weight nodal distribution | Distribution of `QTY-WEIGHT-001` member self-weight quantity to model nodes. | TODO_DOMAIN_VALIDATION | Source/project rule, edition/clause or rule ID, interpretation, nodal distribution assumptions, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and future SDD runtime authorization. |
+| `LOAD-SW-DIST-001` | Self-weight nodal distribution | Distribution of `QTY-WEIGHT-001` member self-weight quantity to model nodes. | TODO_DOMAIN_VALIDATION | Source/project rule; exact edition/clause or project-rule ID; reviewer interpretation; nodal distribution/lumping assumption; target nodes; directions/signs; variables/units; applicability/limits; reviewed numeric example with trace ID; tolerance/rationale; reviewer; ISO date; and explicit future SDD runtime authorization. |
 | `LOAD-WIND-001` | Wind loading | Wind-derived tower load calculation and mapping to analysis nodes. | TODO_DOMAIN_VALIDATION | Exact source clauses, exposure/input assumptions, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-COND-001` | Conductor loads | Conductor-derived load assumptions and transfer to tower attachment nodes. | TODO_DOMAIN_VALIDATION | Source clauses/project rules, span/input assumptions, variables/units, load transfer interpretation, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-COMB-001` | Load combinations / factors | Combination membership and factor application for load cases. | TODO_DOMAIN_VALIDATION | Source/project rule, exact combinations/factors, variables/units, applicability/limits, numeric example showing combined values, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-CTRL-001` | Controlling-case prerequisites | Deterministic rule for selecting or reporting controlling cases after approved combinations exist. | TODO_DOMAIN_VALIDATION | Approved prerequisite combination/factor evidence, controlling metric, tie-breaking/reporting semantics, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 
 Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATION` are non-implementation states. Future code may reference a `LOAD-*` ID only after the row is replaced by a complete reviewer-approved evidence packet and a future SDD phase writes tests first.
+
+### `LOAD-SW-DIST-001` blocked packet guard
+
+`LOAD-SW-DIST-001` remains `TODO_DOMAIN_VALIDATION` because the approval packet is incomplete. The existing `QTY-WEIGHT-001` validation proves only the total member self-weight quantity; it does not decide how that quantity is distributed, which nodes receive it, or which force directions/signs apply.
+
+| Evidence field | Required value before approval | Current value | Gate state |
+|---|---|---|---|
+| Source / project rule | Governing standard, paper, project rule, or reviewer-owned packet for nodal distribution. | not recorded | blocked |
+| Edition / clause or rule ID | Exact edition and clause/reference, or precise project-rule identifier. | not recorded | blocked |
+| Reviewer interpretation | Human-owned interpretation of the source for this engine. | not recorded | blocked |
+| Distribution / lumping assumption | Rule that maps member self-weight quantity to target node loads. | not recorded | blocked |
+| Target nodes | Node selection and allocation semantics. | not recorded | blocked |
+| Directions / signs | Coordinate direction, sign convention, and force component mapping. | not recorded | blocked |
+| Variables / units | Inputs, outputs, unit conversions, and gravity convention if applicable. | quantity inputs exist for `QTY-WEIGHT-001`; distribution variables are not approved | blocked |
+| Applicability / limits | Scope, member/load categories, exclusions, and source-backed limits. | not recorded | blocked |
+| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | not recorded | blocked |
+| Tolerance / rationale | Future software-comparison tolerance and rationale. | not recorded | blocked |
+| Reviewer / ISO date | Reviewer identity and ISO date covering the complete packet. | not recorded | blocked |
+| Runtime authorization | Explicit future SDD that converts the approved packet into tests before implementation. | not recorded | blocked |
+
+Runtime guard: this row must not be converted into Rust runtime behavior, schemas, CLI options, solver logic, reports, optimizer constraints, examples, data, or tests while any field remains blocked.
 
 ### `CHK-SLENDERNESS-001` evidence gate
 

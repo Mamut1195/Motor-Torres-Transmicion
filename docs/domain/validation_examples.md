@@ -193,7 +193,7 @@ Status: required but not approved. These templates are non-executable review pac
 
 | Example ID | Topic | Required inputs and units | Expected calculation shape | Tolerance / rationale | Current state |
 |---|---|---|---|---|---|
-| `example_09_self_weight_nodal_distribution_gate` | Self-weight nodal distribution | Member ID, end nodes, member length, area, density, gravity, coordinate/sign convention, distribution/lumping assumption, output nodal force units. | Compute `QTY-WEIGHT-001`, then apply the approved distribution rule to target nodes and force directions. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; distribution rule, reviewer, and ISO date missing. |
+| `example_09_self_weight_nodal_distribution_gate` | Self-weight nodal distribution | Member ID, end nodes, member length, area, density, gravity, source/project rule, coordinate/sign convention, distribution/lumping assumption, target nodes, output force units. | Compute `QTY-WEIGHT-001`, then apply the approved distribution rule to target nodes and force directions only after the rule is approved. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; source/project rule, exact clause or rule ID, interpretation, distribution assumption, target nodes, directions/signs, numeric example, tolerance, reviewer, ISO date, and runtime authorization missing. |
 | `example_10_wind_load_gate` | Wind loading | Approved source inputs such as geometry, exposure/pressure assumptions, direction, tributary area or equivalent mapping, units, and applicability limits. | Apply the approved wind source interpretation and map resulting loads to the model representation. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact clauses, interpretation, reviewer, and ISO date missing. |
 | `example_11_conductor_load_gate` | Conductor loads | Approved conductor/span inputs, attachment nodes, load direction/sign convention, units, and transfer assumptions. | Apply the approved conductor load rule and map forces to tower attachment nodes. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact assumptions, source, reviewer, and ISO date missing. |
 | `example_12_load_combination_factor_gate` | Load combinations / factors | Approved load case IDs, participating load categories, factors, units, sign convention, and source/project rule. | Combine approved component loads using approved factors and show intermediate and final combined vectors. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; combinations, factors, reviewer, and ISO date missing. |
@@ -213,6 +213,29 @@ Status: required but not approved. These templates are non-executable review pac
 | Runtime authorization | Future SDD change that writes tests before implementing runtime behavior. |
 
 Placeholder rule: every row in this section remains `TODO_DOMAIN_VALIDATION`. Candidate source inventory does not make these accepted examples, and accepted examples are required before load-model v2 implementation can begin.
+
+### Blocked review checklist: `example_09_self_weight_nodal_distribution_gate`
+
+Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a numeric validation example, not an executable fixture, and not approval for generated self-weight nodal loads.
+
+| Field | Required content for future acceptance | Current value |
+|---|---|---|
+| Source / project rule | Governing standard, paper, project rule, or reviewer-owned packet for distributing member self-weight to nodes. | not approved |
+| Edition / clause or rule ID | Exact edition and clause/reference, or precise project-rule identifier. | not approved |
+| Reviewer interpretation | Explanation of how the source applies to this engine and model abstraction. | not approved |
+| Inputs | Member ID, end nodes, member length, area, density, gravity convention if used, and any source-required geometry variables. | not approved |
+| Quantity boundary | `QTY-WEIGHT-001` may provide only the member self-weight quantity; it does not define nodal distribution. | quantity-only; distribution not approved |
+| Distribution / lumping assumption | Rule for splitting or assigning the quantity to target nodes. | not approved |
+| Target nodes | Nodes that receive generated loads and the allocation assigned to each. | not approved |
+| Directions / signs | Coordinate direction, sign convention, and force component mapping for each target node. | not approved |
+| Variables / units | Input variables, output variables, unit conversions, and output nodal force units. | not approved |
+| Applicability / limits | Member categories, geometry assumptions, exclusions, and any source-backed limits. | not approved |
+| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | not approved |
+| Tolerance / rationale | Comparison tolerance and rationale if this later becomes a test fixture. | not approved |
+| Reviewer / ISO date | Human reviewer identity and ISO date for the full packet. | not approved |
+| Runtime authorization | Future SDD change that writes tests before any runtime load-generation implementation. | not approved |
+
+Boundary rule: do not convert this checklist into Rust tests, runtime behavior, schemas, CLI behavior, reports, optimizer constraints, examples, or data until every field is complete and reviewer-approved in a future SDD change.
 
 ## Failed-run examples
 

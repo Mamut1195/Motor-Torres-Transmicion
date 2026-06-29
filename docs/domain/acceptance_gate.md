@@ -125,13 +125,34 @@ Every load-model v2 assumption must keep `TODO_DOMAIN_VALIDATION` until all fiel
 
 | Load-model v2 topic | Current gate state | Required before implementation |
 |---|---|---|
-| Self-weight nodal distribution | `TODO_DOMAIN_VALIDATION` | Approved lumping/modeling assumption, distribution rule, units, example, tolerance, reviewer, and ISO date. |
+| Self-weight nodal distribution | `TODO_DOMAIN_VALIDATION` | Approved source/project rule, exact edition/clause or project-rule ID, reviewer interpretation, lumping/modeling assumption, target nodes, directions/signs, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit future SDD runtime authorization. |
 | Wind loading | `TODO_DOMAIN_VALIDATION` | Exact clauses, exposure/input assumptions, variables/units, applicability limits, numeric example, tolerance, reviewer, and ISO date. |
 | Conductor loads | `TODO_DOMAIN_VALIDATION` | Approved conductor loading assumptions, variables/units, source-backed example, applicability limits, reviewer, and ISO date. |
 | Load combinations / factors | `TODO_DOMAIN_VALIDATION` | Approved combinations, factors, load-case membership rules, numeric example, tolerance, reviewer, and ISO date. |
 | Controlling-case prerequisites | `TODO_DOMAIN_VALIDATION` | Approved semantics for comparing cases, prerequisite combination/factor evidence, deterministic selection rule, reviewer, and ISO date. |
 
 Acceptance rule: candidate source rows in `standards_map.md` are inventory only. A formula, rule, or assumption is approved only when the full approval packet is complete in `formulas_register.md` and its accepted example is complete in `validation_examples.md`.
+
+### Self-weight nodal distribution source-review checklist
+
+`LOAD-SW-DIST-001` and `example_09_self_weight_nodal_distribution_gate` remain `TODO_DOMAIN_VALIDATION`. This section is a blocked review checklist only; it does not approve generated nodal loads, provide a numeric example, name a reviewer/date, or authorize runtime work.
+
+| Checklist item | Required before approval | Current gate state |
+|---|---|---|
+| Source / project rule | Standard, paper, project rule, or reviewer-owned rule packet that governs distribution from member self-weight quantity to nodes. | missing; blocked |
+| Edition / clause or rule ID | Exact edition and clause/reference, or precise project-rule identifier. | missing; blocked |
+| Reviewer interpretation | Human-owned explanation of how the source applies to this engine and model abstraction. | missing; blocked |
+| Distribution / lumping assumption | Approved assumption for converting `QTY-WEIGHT-001` member self-weight quantity into nodal loads. | missing; blocked |
+| Target nodes | Which node or nodes receive the generated load and why. | missing; blocked |
+| Directions / signs | Coordinate direction, sign convention, and output force components. | missing; blocked |
+| Variables / units | Input variables, output variables, unit conversions, and gravity convention if used. | missing; blocked |
+| Applicability / limits | Member categories, geometry assumptions, exclusions, and any source-backed limits. | missing; blocked |
+| Numeric example | Reviewed inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | missing; blocked |
+| Tolerance / rationale | Software-comparison tolerance and rationale for a future tests-first SDD. | missing; blocked |
+| Reviewer / ISO date | Human reviewer identity and ISO approval date for the complete packet. | missing; blocked |
+| Runtime authorization | Explicit future SDD scope that writes tests before any load-generation implementation. | missing; blocked |
+
+Boundary rule: `QTY-WEIGHT-001` is quantity-only evidence. It validates a member self-weight quantity trace; it is not a nodal distribution rule, not a load-generation rule, and not authorization for schema, CLI, solver, reporting, optimizer, example, test, or data changes.
 
 ## `CHK-SLENDERNESS-001` research gate
 

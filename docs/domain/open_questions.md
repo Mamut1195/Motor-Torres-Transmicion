@@ -36,13 +36,15 @@ These questions are the required answer set for future load-model v2 work. Until
 
 | ID | Topic | Answer required before implementation | Blocks implementation? | Current status |
 |---|---|---|---|---|
-| Q-LOAD-V2-001 | Self-weight nodal distribution | Which source-backed lumping/modeling assumption converts `QTY-WEIGHT-001` member self-weight quantity into nodal loads, what nodes receive the load, what directions/signs apply, and what numeric example proves the distribution? | Yes, for generated self-weight nodal loads | `TODO_DOMAIN_VALIDATION`; candidate quantity exists, distribution rule not approved. |
+| Q-LOAD-V2-001 | Self-weight nodal distribution | Which source/project rule, exact edition/clause or rule ID, reviewer interpretation, lumping/modeling assumption, target nodes, directions/signs, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and future SDD runtime authorization convert `QTY-WEIGHT-001` quantity-only evidence into approved nodal distribution? | Yes, for generated self-weight nodal loads | `TODO_DOMAIN_VALIDATION`; `QTY-WEIGHT-001` validates quantity only, distribution rule and approval packet are not approved. |
 | Q-LOAD-V2-002 | Wind loading | Which exact source clauses, edition, exposure assumptions, tower geometry inputs, pressure/force variables, units, limitations, and numeric example are approved? | Yes, for wind-derived loads | `TODO_DOMAIN_VALIDATION`; source candidates only. |
 | Q-LOAD-V2-003 | Conductor loads | Which conductor loading assumptions, span/input variables, units, load transfer semantics, applicability limits, and numeric example are approved? | Yes, for conductor-derived loads | `TODO_DOMAIN_VALIDATION`; source candidates only. |
 | Q-LOAD-V2-004 | Load combinations / factors | Which load cases participate, which factors apply, which source/project rule governs, and what example proves the combined load vector? | Yes, for combinations and factors | `TODO_DOMAIN_VALIDATION`; no combinations or factors approved. |
 | Q-LOAD-V2-005 | Controlling-case prerequisites | After combinations/factors are approved, what deterministic rule selects or reports the controlling case, and what evidence prevents unapproved cases from becoming feasibility evidence? | Yes, for controlling-case execution | `TODO_DOMAIN_VALIDATION`; controlling-case semantics blocked. |
 
 Each answer must identify source, edition/clause, interpretation, variables/units, applicability/limits, assumptions, numeric example, tolerance/rationale if testable, reviewer, ISO date, and future SDD runtime authorization. Candidate-source inventory alone is not an answer.
+
+`Q-LOAD-V2-001` remains open until the complete self-weight nodal distribution packet is reviewer-approved. The answer must not rely on `QTY-WEIGHT-001` alone: that trace is quantity-only evidence and does not decide nodal lumping, target nodes, directions/signs, runtime authorization, or software test expectations.
 
 ### `CHK-SLENDERNESS-001` blocker checklist
 
