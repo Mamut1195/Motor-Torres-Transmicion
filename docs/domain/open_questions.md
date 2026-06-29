@@ -30,6 +30,20 @@ These questions remain open and must be reported as `TODO_DOMAIN_VALIDATION` unt
 | Q-LOAD-004 | Which load combinations and load factors are approved for MVP reports? | `TODO_DOMAIN_VALIDATION`; no combinations or factors. |
 | Q-LOAD-005 | Which displacement or design-level loading criteria are approved? | `TODO_DOMAIN_VALIDATION`; no final-design loading claim. |
 
+## Load Model v2 Evidence Questions
+
+These questions are the required answer set for future load-model v2 work. Until an answer includes the full approval evidence packet, the related formula or rule remains `TODO_DOMAIN_VALIDATION` and blocked from runtime consumption.
+
+| ID | Topic | Answer required before implementation | Blocks implementation? | Current status |
+|---|---|---|---|---|
+| Q-LOAD-V2-001 | Self-weight nodal distribution | Which source-backed lumping/modeling assumption converts `QTY-WEIGHT-001` member self-weight quantity into nodal loads, what nodes receive the load, what directions/signs apply, and what numeric example proves the distribution? | Yes, for generated self-weight nodal loads | `TODO_DOMAIN_VALIDATION`; candidate quantity exists, distribution rule not approved. |
+| Q-LOAD-V2-002 | Wind loading | Which exact source clauses, edition, exposure assumptions, tower geometry inputs, pressure/force variables, units, limitations, and numeric example are approved? | Yes, for wind-derived loads | `TODO_DOMAIN_VALIDATION`; source candidates only. |
+| Q-LOAD-V2-003 | Conductor loads | Which conductor loading assumptions, span/input variables, units, load transfer semantics, applicability limits, and numeric example are approved? | Yes, for conductor-derived loads | `TODO_DOMAIN_VALIDATION`; source candidates only. |
+| Q-LOAD-V2-004 | Load combinations / factors | Which load cases participate, which factors apply, which source/project rule governs, and what example proves the combined load vector? | Yes, for combinations and factors | `TODO_DOMAIN_VALIDATION`; no combinations or factors approved. |
+| Q-LOAD-V2-005 | Controlling-case prerequisites | After combinations/factors are approved, what deterministic rule selects or reports the controlling case, and what evidence prevents unapproved cases from becoming feasibility evidence? | Yes, for controlling-case execution | `TODO_DOMAIN_VALIDATION`; controlling-case semantics blocked. |
+
+Each answer must identify source, edition/clause, interpretation, variables/units, applicability/limits, assumptions, numeric example, tolerance/rationale if testable, reviewer, ISO date, and future SDD runtime authorization. Candidate-source inventory alone is not an answer.
+
 ### `CHK-SLENDERNESS-001` blocker checklist
 
 The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.

@@ -187,6 +187,33 @@ The following shape defines the evidence that a future reviewer must supply. It 
 
 `example_08_slenderness_effective_length_gate` is a non-accepted placeholder. It must not be converted into a Rust test, runtime fixture, report output, optimizer constraint, or implementation formula until reviewer-approved clauses, inputs, limits if any, expected values, reviewer identity, and ISO date are recorded.
 
+## Load Model v2 accepted-example packet templates
+
+Status: required but not approved. These templates are non-executable review packets. They must not be converted into tests, examples, runtime behavior, reports, optimizer constraints, or controlling-case execution until every approval field is complete.
+
+| Example ID | Topic | Required inputs and units | Expected calculation shape | Tolerance / rationale | Current state |
+|---|---|---|---|---|---|
+| `example_09_self_weight_nodal_distribution_gate` | Self-weight nodal distribution | Member ID, end nodes, member length, area, density, gravity, coordinate/sign convention, distribution/lumping assumption, output nodal force units. | Compute `QTY-WEIGHT-001`, then apply the approved distribution rule to target nodes and force directions. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; distribution rule, reviewer, and ISO date missing. |
+| `example_10_wind_load_gate` | Wind loading | Approved source inputs such as geometry, exposure/pressure assumptions, direction, tributary area or equivalent mapping, units, and applicability limits. | Apply the approved wind source interpretation and map resulting loads to the model representation. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact clauses, interpretation, reviewer, and ISO date missing. |
+| `example_11_conductor_load_gate` | Conductor loads | Approved conductor/span inputs, attachment nodes, load direction/sign convention, units, and transfer assumptions. | Apply the approved conductor load rule and map forces to tower attachment nodes. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact assumptions, source, reviewer, and ISO date missing. |
+| `example_12_load_combination_factor_gate` | Load combinations / factors | Approved load case IDs, participating load categories, factors, units, sign convention, and source/project rule. | Combine approved component loads using approved factors and show intermediate and final combined vectors. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; combinations, factors, reviewer, and ISO date missing. |
+| `example_13_controlling_case_gate` | Controlling-case prerequisites | Approved combined case results, governing metric, tie-breaking/reporting rule, blocked-case handling, and units where applicable. | Select or report the controlling case only from approved combinations using the approved deterministic rule. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; prerequisite combinations and controlling semantics missing. |
+
+### Required approval fields for each load-model v2 example
+
+| Field | Required content before example acceptance |
+|---|---|
+| Source clause | Exact source, edition, clause/reference, or reviewer-owned project-rule ID. |
+| Interpretation | How the reviewer applies the source to this engine. |
+| Variables / units | Input variables, output variables, unit conversions, and sign convention. |
+| Applicability / limits | Scope, exclusions, and assumptions required for safe use. |
+| Numeric example | Inputs, substitutions, intermediate values, final expected result, and trace ID. |
+| Tolerance / rationale | Comparison tolerance and rationale if the example becomes a future test. |
+| Reviewer / date | Human reviewer identity and ISO approval date. |
+| Runtime authorization | Future SDD change that writes tests before implementing runtime behavior. |
+
+Placeholder rule: every row in this section remains `TODO_DOMAIN_VALIDATION`. Candidate source inventory does not make these accepted examples, and accepted examples are required before load-model v2 implementation can begin.
+
 ## Failed-run examples
 
 Failed-run reports generated from singular, unstable, validation-error, or unsupported-rule examples must include:

@@ -92,6 +92,47 @@ This reporting and documentation boundary is not for final engineering design.
 
 Acceptance rule: reports may expose status/source evidence and blocked categories only. They must not emit code-compliant loading behavior, load combinations/factors, generated self-weight nodal loads, wind/conductor loading, or final engineering design claims.
 
+## Load Model v2 source evidence gate
+
+This gate is a reviewer-facing evidence package only. It inventories candidate sources and approval requirements for a future load-model v2 phase, but it does not approve formulas, authorize runtime behavior, or change the current solver boundary.
+
+### Runtime boundary
+
+- The only analysis-ready load cases remain explicit user-input nodal loads that pass the current runtime validation boundary.
+- Source inventory, candidate clauses, pending formulas, provisional notes, and `TODO_DOMAIN_VALIDATION` records must not be consumed by runtime code.
+- This gate does not allow Rust runtime, schema, CLI, solver, reporting, optimizer, example, or test changes.
+- This gate does not allow automatic self-weight nodal load generation, wind-load generation, conductor-load generation, load-combination execution, load-factor application, or controlling-case selection.
+
+### Approval fields required before future runtime work
+
+Every load-model v2 assumption must keep `TODO_DOMAIN_VALIDATION` until all fields below are complete and reviewer-approved:
+
+| Approval field | Required content before approval |
+|---|---|
+| Source | Standard, paper, project rule, or reviewer-owned rule packet. |
+| Edition / clause | Exact edition and clause/reference, or a precise project-rule identifier. |
+| Interpretation | Reviewer-owned explanation of how the source applies to this engine. |
+| Variables / units | Input variables, output variables, units, conversion policy, and sign convention. |
+| Applicability / limits | Scope, exclusions, member/load categories, and any source-backed limits. |
+| Assumptions | Modeling assumptions required to apply the rule safely. |
+| Numeric example | Reviewed calculation with inputs, substitutions, intermediate values, expected result, and trace ID. |
+| Tolerance / rationale | Software-comparison tolerance and rationale when the example becomes testable. |
+| Reviewer | Human reviewer identity. |
+| Approval date | ISO date covering the full evidence packet. |
+| Runtime authorization | Explicit future SDD scope that converts the approved packet into tests before implementation. |
+
+### Topic checklist
+
+| Load-model v2 topic | Current gate state | Required before implementation |
+|---|---|---|
+| Self-weight nodal distribution | `TODO_DOMAIN_VALIDATION` | Approved lumping/modeling assumption, distribution rule, units, example, tolerance, reviewer, and ISO date. |
+| Wind loading | `TODO_DOMAIN_VALIDATION` | Exact clauses, exposure/input assumptions, variables/units, applicability limits, numeric example, tolerance, reviewer, and ISO date. |
+| Conductor loads | `TODO_DOMAIN_VALIDATION` | Approved conductor loading assumptions, variables/units, source-backed example, applicability limits, reviewer, and ISO date. |
+| Load combinations / factors | `TODO_DOMAIN_VALIDATION` | Approved combinations, factors, load-case membership rules, numeric example, tolerance, reviewer, and ISO date. |
+| Controlling-case prerequisites | `TODO_DOMAIN_VALIDATION` | Approved semantics for comparing cases, prerequisite combination/factor evidence, deterministic selection rule, reviewer, and ISO date. |
+
+Acceptance rule: candidate source rows in `standards_map.md` are inventory only. A formula, rule, or assumption is approved only when the full approval packet is complete in `formulas_register.md` and its accepted example is complete in `validation_examples.md`.
+
 ## `CHK-SLENDERNESS-001` research gate
 
 `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION`. A future implementation request must be rejected or deferred unless all gate items below are complete:

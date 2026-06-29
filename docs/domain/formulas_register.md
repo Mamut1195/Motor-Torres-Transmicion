@@ -46,6 +46,20 @@ The `QTY-WEIGHT-001` entry is a non-normative quantity trace for software-level 
 
 The `CHK-TENSION-001` and `CHK-COMPRESSION-001` entries validate only preliminary axial stress utilization from solved member axial force, nominal section area, and material yield stress. They do not validate buckling, slenderness, displacement, load combinations, connection checks, or final engineering design acceptance.
 
+## Load Model v2 Candidate Evidence Register
+
+This register separates source inventory from approval. Rows below are not approved formulas or runtime authorization. Any row with missing approval evidence remains `TODO_DOMAIN_VALIDATION` and must not be converted into Rust runtime behavior, schema fields, CLI behavior, reports, optimizer constraints, examples, or tests.
+
+| ID | Load topic | Candidate formula / rule | Status | Required approval evidence |
+|---|---|---|---|---|
+| `LOAD-SW-DIST-001` | Self-weight nodal distribution | Distribution of `QTY-WEIGHT-001` member self-weight quantity to model nodes. | TODO_DOMAIN_VALIDATION | Source/project rule, edition/clause or rule ID, interpretation, nodal distribution assumptions, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and future SDD runtime authorization. |
+| `LOAD-WIND-001` | Wind loading | Wind-derived tower load calculation and mapping to analysis nodes. | TODO_DOMAIN_VALIDATION | Exact source clauses, exposure/input assumptions, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
+| `LOAD-COND-001` | Conductor loads | Conductor-derived load assumptions and transfer to tower attachment nodes. | TODO_DOMAIN_VALIDATION | Source clauses/project rules, span/input assumptions, variables/units, load transfer interpretation, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
+| `LOAD-COMB-001` | Load combinations / factors | Combination membership and factor application for load cases. | TODO_DOMAIN_VALIDATION | Source/project rule, exact combinations/factors, variables/units, applicability/limits, numeric example showing combined values, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
+| `LOAD-CTRL-001` | Controlling-case prerequisites | Deterministic rule for selecting or reporting controlling cases after approved combinations exist. | TODO_DOMAIN_VALIDATION | Approved prerequisite combination/factor evidence, controlling metric, tie-breaking/reporting semantics, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
+
+Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATION` are non-implementation states. Future code may reference a `LOAD-*` ID only after the row is replaced by a complete reviewer-approved evidence packet and a future SDD phase writes tests first.
+
 ### `CHK-SLENDERNESS-001` evidence gate
 
 `CHK-SLENDERNESS-001` remains blocked as `TODO_DOMAIN_VALIDATION`. Documentation, reports, optimizers, and future implementation proposals must not treat it as pass/fail compliance, final design evidence, or feasibility evidence until the formula-register row is replaced by a reviewer-approved, source-backed status.

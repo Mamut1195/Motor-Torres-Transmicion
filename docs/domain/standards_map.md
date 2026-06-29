@@ -52,6 +52,20 @@ This section is not for final engineering design. It records how reporting may d
 | Load combinations and factors | Candidate sources only; no approved combinations/factors | Report as `TODO_DOMAIN_VALIDATION`; do not infer combinations or factors. |
 | Displacement/design-level loading | Unapproved for the load-model slice | Report as `TODO_DOMAIN_VALIDATION`; do not emit final-design claims. |
 
+## Load Model v2 Candidate Source Inventory
+
+This inventory helps reviewers find sources. It is not approval. A source listed here remains `candidate` until the formula register records the exact clause/reference, interpretation, variables/units, applicability/limits, assumptions, accepted numeric example, tolerance/rationale if testable, reviewer, ISO date, and future SDD runtime authorization.
+
+| Source ID | Load topic | Candidate source / clause reference | Intended review role | Evidence status | Runtime authorization |
+|---|---|---|---|---|---|
+| `SRC-ASCE-MOP74-LOADS-CANDIDATE` | Self-weight distribution, wind, conductor loads, combinations | ASCE MOP 74; exact edition/clause references not yet recorded | Candidate transmission-line loading guidance for reviewer extraction. | candidate | none; `TODO_DOMAIN_VALIDATION` remains. |
+| `SRC-IEC-60826-LOADS-CANDIDATE` | Wind, conductor loads, reliability/loading cases | IEC 60826; exact edition/clause references not yet recorded | Candidate reliability/loading source for reviewer comparison. | candidate | none; `TODO_DOMAIN_VALIDATION` remains. |
+| `SRC-ASCE7-WIND-CONTEXT` | Wind loading context | ASCE 7; exact clause references not approved for this engine | Supporting wind context only; not tower-specific approval by itself. | candidate/context | none; `TODO_DOMAIN_VALIDATION` remains. |
+| `SRC-PROJECT-LOAD-CRITERIA-CANDIDATE` | Load combinations / factors, controlling-case prerequisites | Future reviewer-owned project criteria packet | Project-specific rule source required if standards do not define the MVP boundary directly. | blocked | none; waiting for reviewer-owned packet. |
+| `SRC-QTY-WEIGHT-001-CONTEXT` | Self-weight nodal distribution | Existing validated quantity `QTY-WEIGHT-001` | Quantity source only; may support a future distribution rule but does not define lumping or nodal mapping. | validated quantity / distribution not approved | none for generated loads. |
+
+Inventory rule: do not infer formulas, factors, nodal distribution, wind pressure, conductor effects, or controlling-case behavior from this table. Approval must happen in `formulas_register.md` and `validation_examples.md` before any runtime phase can proceed.
+
 ## `CHK-SLENDERNESS-001` Source Evidence Inventory
 
 This table is an inventory and review checklist. It does not approve a formula, limit, example, or implementation path. A listed source remains `candidate` until a reviewer records the exact clause/reference, interpretation, reviewer name, and ISO approval date in the downstream evidence ledger.
