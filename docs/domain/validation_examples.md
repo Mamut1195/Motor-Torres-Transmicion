@@ -44,7 +44,7 @@ This is a hand-derived axial bar fixture for WU3 Strict TDD solver tests. It is 
 | Support reaction at Node A `FX` | `-10` | `kN` | `NUM-AXIAL-003` |
 | Member axial force | `+10` | `kN` tension | `NUM-AXIAL-004` |
 
-Proof note: `crates/tower-core/tests/analysis_solver.rs` references `example_01_simple_bar` and `NUM-AXIAL-001` through `NUM-AXIAL-004`. The values follow `k = AE/L = 0.001 * 200,000,000 / 2 = 100,000 kN/m`, `UX = F/k = 10 / 100,000 = 0.0001 m`, support equilibrium `FX = -10 kN`, and axial tension `+10 kN`.
+Proof note: `crates/tower-core/tests/analysis_solver.rs` references `example_01_simple_bar` and `NUM-AXIAL-001` through `NUM-AXIAL-004`. The source-example harness also validates `crates/tower-core/tests/fixtures/source_examples/example_01_simple_bar.toml` against `examples/simple_bar.toml` without embedding model text. The values follow `k = AE/L = 0.001 * 200,000,000 / 2 = 100,000 kN/m`, `UX = F/k = 10 / 100,000 = 0.0001 m`, support equilibrium `FX = -10 kN`, and axial tension `+10 kN`.
 
 ## Proposed reference fixture: `example_02_simple_3d_truss_star`
 
@@ -236,6 +236,8 @@ Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a
 | Runtime authorization | Future SDD change that writes tests before any runtime load-generation implementation. | not approved |
 
 Boundary rule: do not convert this checklist into Rust tests, runtime behavior, schemas, CLI behavior, reports, optimizer constraints, examples, or data until every field is complete and reviewer-approved in a future SDD change.
+
+Harness note: `crates/tower-core/tests/fixtures/source_examples/example_09_self_weight_nodal_distribution_gate.toml` preserves this item as non-executable `TODO_DOMAIN_VALIDATION` metadata only. It does not approve runtime load generation, formulas, signs, or Matrix-derived self-weight distribution behavior.
 
 ### Candidate Matrix evidence for `example_09_self_weight_nodal_distribution_gate`
 

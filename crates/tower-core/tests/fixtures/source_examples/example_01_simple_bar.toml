@@ -1,0 +1,42 @@
+id = "example_01_simple_bar"
+status = "approved"
+trace_ids = ["NUM-AXIAL-001", "NUM-AXIAL-002", "NUM-AXIAL-003", "NUM-AXIAL-004"]
+allowed_target = "tower_core_truss_solver"
+
+[source]
+document = "docs/domain/validation_examples.md"
+section = "Proposed reference fixture: example_01_simple_bar"
+page = "validation_examples.md#example_01_simple_bar"
+equation = "k = AE/L; UX = F/k; reaction equilibrium; axial force"
+
+[approval]
+reviewer = "Jonnathan"
+date = "2026-06-27"
+
+[model]
+path = "../../../../../examples/simple_bar.toml"
+load_case = "axial"
+
+[[expected]]
+kind = "displacement"
+node_id = "free"
+component = "ux_m"
+value = 0.0001
+unit = "m"
+tolerance = { absolute = 1e-9, relative = 1e-7, rationale = "WU3 closed-form axial bar displacement" }
+
+[[expected]]
+kind = "reaction"
+node_id = "fixed"
+component = "fx_kn"
+value = -10.0
+unit = "kN"
+tolerance = { absolute = 1e-9, relative = 1e-7, rationale = "WU3 closed-form support equilibrium" }
+
+[[expected]]
+kind = "member_force"
+member_id = "bar-x"
+component = "axial_kn"
+value = 10.0
+unit = "kN"
+tolerance = { absolute = 1e-9, relative = 1e-7, rationale = "WU3 closed-form axial force" }

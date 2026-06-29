@@ -1,0 +1,28 @@
+id = "example_09_self_weight_nodal_distribution_gate"
+status = "TODO_DOMAIN_VALIDATION"
+trace_ids = ["QTY-WEIGHT-001", "LOAD-SW-DIST-001"]
+blocked_reason = "Self-weight nodal distribution needs manual PDF/equation/sign review before runtime authorization."
+missing_approval_fields = [
+    "source/project rule",
+    "exact clause or rule ID",
+    "reviewer interpretation",
+    "distribution/lumping assumption",
+    "target nodes",
+    "directions/signs",
+    "numeric example",
+    "tolerance rationale",
+    "reviewer",
+    "ISO date",
+    "runtime authorization",
+]
+candidate_sources = [
+    "SRC-MATRIX-CH5-LOADS-BETWEEN-NODES",
+    "SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS",
+    "SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS",
+]
+
+[source]
+document = "docs/domain/validation_examples.md"
+section = "Blocked review checklist: example_09_self_weight_nodal_distribution_gate"
+page = "validation_examples.md#example_09_self_weight_nodal_distribution_gate"
+equation = "TODO_DOMAIN_VALIDATION"
