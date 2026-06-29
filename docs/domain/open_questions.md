@@ -46,6 +46,19 @@ Each answer must identify source, edition/clause, interpretation, variables/unit
 
 `Q-LOAD-V2-001` remains open until the complete self-weight nodal distribution packet is reviewer-approved. The answer must not rely on `QTY-WEIGHT-001` alone: that trace is quantity-only evidence and does not decide nodal lumping, target nodes, directions/signs, runtime authorization, or software test expectations.
 
+### Matrix Structural Analysis review blockers for `Q-LOAD-V2-001`
+
+Matrix Structural Analysis is now candidate/supporting source evidence, but it does not close `Q-LOAD-V2-001`. The reviewer must still resolve the following before generated self-weight nodal loads can be considered for a future tests-first SDD:
+
+| Blocker | Required resolution | Current status |
+|---|---|---|
+| PDF page and equation verification | Manually verify Ch. 5 §5.2/Fig. 5.6/Table 5.1/Eq. 5.21 and Ch. 7 §7.5/Eq. 7.32 against the PDF pages recorded in `standards_map.md` and `formulas_register.md`. | open |
+| Applicability to axial truss members | Decide whether beam/frame equivalent-load evidence and the explored uniformly loaded axial member note apply to this engine's axial truss abstraction. | open |
+| Target nodes and allocation | Approve which member end nodes receive generated self-weight loads and how the quantity is allocated. | open |
+| Directions and signs | Approve gravity direction, coordinate convention, sign convention, and output force components. | open |
+| Numeric example and tolerance | Provide reviewed inputs, substitutions, intermediate values, expected nodal force results, trace ID, and comparison tolerance/rationale. | open |
+| Reviewer authorization | Record reviewer identity, ISO date, interpretation, and explicit future runtime authorization. | open |
+
 ### `CHK-SLENDERNESS-001` blocker checklist
 
 The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.

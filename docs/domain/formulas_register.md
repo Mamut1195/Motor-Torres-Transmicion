@@ -81,6 +81,20 @@ Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATIO
 
 Runtime guard: this row must not be converted into Rust runtime behavior, schemas, CLI options, solver logic, reports, optimizer constraints, examples, data, or tests while any field remains blocked.
 
+#### `LOAD-SW-DIST-001` Matrix Structural Analysis candidate evidence
+
+The following entries are candidate/supporting evidence only. They do not replace the blocked approval fields above and do not authorize generated self-weight nodal loads.
+
+| Candidate source ID | Source reference from exploration | Support level | Review status | Approval impact |
+|---|---|---|---|---|
+| `SRC-MATRIX-CH3-DIRECT-STIFFNESS-CONTEXT` | Matrix Structural Analysis, Second Edition, Ch. 3 §§3.1-3.2; exploration pointer: book pp. 31-46 / PDF pp. 52-67 | Context for direct-stiffness global displacement and force vectors. | Manual PDF page review and reviewer interpretation required. | Does not define self-weight distribution. |
+| `SRC-MATRIX-CH5-LOADS-BETWEEN-NODES` | Ch. 5 §5.2 `Loads Between Nodal Points`; exploration pointer: book p. 108 / PDF p. 129 | Candidate support for loads between joints/natural nodes, selected-node lumping, and static equivalence. | Manual PDF page and wording review required. | Does not approve this engine's lumping rule or target nodes. |
+| `SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS` | Ch. 5 §5.2, Fig. 5.6, Table 5.1, Eq. 5.21; exploration pointer: book pp. 110-112 / PDF pp. 131-133 | Candidate support for fixed-end forces and reversed fixed-end/equivalent nodal loads in stiffness analysis. | Manual PDF page, equation, and sign review required. | Beam/frame fixed-end evidence must not be applied blindly to axial truss members. |
+| `SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Ch. 7 §7.5, Eq. 7.32; exploration pointer: book pp. 194-196 / PDF pp. 215-217 | Candidate support for effective/work-equivalent nodal loads; exploration notes possible simple apportionment for a uniformly loaded axial member. | Manual PDF page, equation, sign, and reviewer applicability review required. | Closest supporting evidence, but still does not approve gravity direction, sign convention, target nodes, or runtime behavior. |
+| `SRC-MATRIX-CH13-DEAD-LOAD-CONTEXT` | Ch. 13 dead-load mention; exploration pointer: book p. 410 / PDF p. 431 | Non-supporting context only. | Manual PDF page review required if cited further. | Does not define a self-weight generation or distribution rule. |
+
+Matrix approval blocker: extracted equations, signs, and page references remain untrusted until a human reviewer manually checks the PDF and records interpretation. `LOAD-SW-DIST-001` stays `TODO_DOMAIN_VALIDATION` until the complete approval packet is filled, including applicability to axial truss members, target nodes, directions/signs, reviewed numeric example, tolerance, reviewer identity, ISO date, and explicit future tests-first runtime authorization.
+
 ### `CHK-SLENDERNESS-001` evidence gate
 
 `CHK-SLENDERNESS-001` remains blocked as `TODO_DOMAIN_VALIDATION`. Documentation, reports, optimizers, and future implementation proposals must not treat it as pass/fail compliance, final design evidence, or feasibility evidence until the formula-register row is replaced by a reviewer-approved, source-backed status.

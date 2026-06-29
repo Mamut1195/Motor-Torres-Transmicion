@@ -31,7 +31,7 @@ This register inventories candidate domain sources for MAMUT Tower Engine. It do
 |---|---|---|---|---|
 | REF-TIMOSHENKO-GERE-STABILITY | Timoshenko & Gere — Theory of Elastic Stability | `docs/domain/Theory of Elastic Stability (Dover Civil and Mechanical Engineering) (Gere, James M.  Timoshenko, Stephen P.).pdf` | Supporting theory for compression, buckling, and slenderness concepts. | source-candidate |
 | REF-CONCEPTUAL-TOWER-DESIGN | Diseño conceptual de torres | `docs/domain/Diseno-conceptual-de-torres.pdf` | Candidate reference for tower geometry/domain vocabulary; needs review. | pending-review |
-| REF-MATRIX-STRUCTURAL | Matrix structural analysis textbook/reference | Not provided yet | 3D truss stiffness validation and numerical examples. | inventory-only |
+| REF-MATRIX-STRUCTURAL | McGuire, Gallagher, and Ziemian — Matrix Structural Analysis, Second Edition | `docs/domain/Matrix Structural Analysis, Second Edition -- by William McGuire, Richard H_ Gallagher, Ronald D_ Ziemian -- 2, 2015 -- CreateSpace Independent -- isbn13 9780471129189 -- a0e73461b6e261421f79756471a7de2c -- Anna’s Archive.pdf` | Candidate/supporting evidence for direct-stiffness equivalent nodal/effective joint load concepts. It does not approve self-weight nodal distribution, signs, target nodes, or runtime generation. | source-candidate |
 | REF-RUST-NUMERICS | Rust linear algebra crate docs selected by ADR | Not selected yet | Solver implementation behavior after dependency ADR. | inventory-only |
 
 ## Optimization Papers

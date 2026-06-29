@@ -154,6 +154,19 @@ Acceptance rule: candidate source rows in `standards_map.md` are inventory only.
 
 Boundary rule: `QTY-WEIGHT-001` is quantity-only evidence. It validates a member self-weight quantity trace; it is not a nodal distribution rule, not a load-generation rule, and not authorization for schema, CLI, solver, reporting, optimizer, example, test, or data changes.
 
+### Matrix Structural Analysis candidate evidence guard
+
+Matrix Structural Analysis, Second Edition has been recorded as candidate/supporting evidence for equivalent nodal and work-equivalent load concepts. This does not change the gate decision: `LOAD-SW-DIST-001` and `example_09_self_weight_nodal_distribution_gate` remain `TODO_DOMAIN_VALIDATION`.
+
+| Candidate evidence | Current gate state |
+|---|---|
+| Ch. 5 §5.2, Fig. 5.6, Table 5.1, and Eq. 5.21 exploration pointers | Candidate/supporting only; manual PDF page, equation, and sign review required. |
+| Ch. 7 §7.5 and Eq. 7.32 exploration pointers | Candidate/supporting only; reviewer must interpret applicability to axial truss self-weight members. |
+| Ch. 3 §§3.1-3.2 direct-stiffness context | Context only; not a self-weight distribution rule. |
+| Ch. 13 dead-load mention | Non-supporting context unless a future reviewer explicitly documents otherwise. |
+
+Acceptance rule: Matrix evidence alone cannot approve generated nodal loads. Approval still requires reviewer identity, ISO date, interpretation, assumptions, signs, target nodes, applicability limits, reviewed numeric example, tolerance/rationale, and explicit future tests-first runtime authorization.
+
 ## `CHK-SLENDERNESS-001` research gate
 
 `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION`. A future implementation request must be rejected or deferred unless all gate items below are complete:

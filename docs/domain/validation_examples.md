@@ -237,6 +237,18 @@ Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a
 
 Boundary rule: do not convert this checklist into Rust tests, runtime behavior, schemas, CLI behavior, reports, optimizer constraints, examples, or data until every field is complete and reviewer-approved in a future SDD change.
 
+### Candidate Matrix evidence for `example_09_self_weight_nodal_distribution_gate`
+
+Matrix Structural Analysis is relevant source inventory for a future accepted example, but it is not an accepted example by itself. Exploration page pointers are recorded below so a reviewer can manually verify the PDF before approving any calculation.
+
+| Candidate source ID | Candidate reference | Possible review use | Current blocker |
+|---|---|---|---|
+| `SRC-MATRIX-CH5-LOADS-BETWEEN-NODES` | Matrix Structural Analysis, Second Edition, Ch. 5 §5.2; exploration pointer: book p. 108 / PDF p. 129 | Review whether loads between joints and static-equivalent lumping can support a member self-weight distribution example. | Reviewer must approve interpretation, target nodes, signs, and applicability to this engine. |
+| `SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS` | Ch. 5 §5.2, Fig. 5.6, Table 5.1, Eq. 5.21; exploration pointer: book pp. 110-112 / PDF pp. 131-133 | Review equivalent nodal load treatment from fixed-end/reversed fixed-end force concepts. | Equations/signs require manual PDF review; frame/beam evidence cannot be blindly mapped to axial truss members. |
+| `SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Ch. 7 §7.5, Eq. 7.32; exploration pointer: book pp. 194-196 / PDF pp. 215-217 | Review effective/work-equivalent nodal load derivation and the explored uniformly loaded axial member apportionment note. | Reviewer must manually verify the equation/signs and decide whether it applies to gravity self-weight in the project coordinate convention. |
+
+No numeric values are approved for `example_09_self_weight_nodal_distribution_gate`. A future accepted example must still provide reviewer-approved inputs, substitutions, intermediate values, expected nodal forces, tolerance/rationale, trace ID, reviewer identity, ISO date, and runtime authorization through a future tests-first SDD.
+
 ## Failed-run examples
 
 Failed-run reports generated from singular, unstable, validation-error, or unsupported-rule examples must include:
