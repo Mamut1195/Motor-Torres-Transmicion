@@ -218,6 +218,8 @@ Placeholder rule: every row in this section remains `TODO_DOMAIN_VALIDATION`. Ca
 
 Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a numeric validation example, not an executable fixture, and not approval for generated self-weight nodal loads.
 
+Mandatory ledger fields for `LOAD-SW-DIST-001` are: source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. Candidate inventory/arithmetic is not approved engineering evidence and does not authorize runtime execution.
+
 Candidate arithmetic: the approved quantity-only trace provides total self-weight `0.153964405 kN`. Under an unapproved equal-end lumping assumption, the review-only arithmetic records an equal-end candidate value `0.0769822025 kN` at each end. These values are reviewer material only: axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization remain unapproved.
 
 | Field | Required content for future acceptance | Current value |

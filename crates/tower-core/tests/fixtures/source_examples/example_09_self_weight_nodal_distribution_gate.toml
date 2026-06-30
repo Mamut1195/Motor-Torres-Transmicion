@@ -3,17 +3,19 @@ status = "TODO_DOMAIN_VALIDATION"
 trace_ids = ["QTY-WEIGHT-001", "LOAD-SW-DIST-001"]
 blocked_reason = "Self-weight nodal distribution needs manual PDF/equation/sign review before runtime authorization."
 missing_approval_fields = [
-    "source/project rule",
-    "exact clause or rule ID",
+    "source rule",
+    "clause/project-rule ID",
     "reviewer interpretation",
-    "distribution/lumping assumption",
+    "assumptions",
     "target nodes",
-    "directions/signs",
-    "numeric example",
+    "signs/directions",
+    "units",
+    "applicability limits",
+    "numeric trace",
     "tolerance rationale",
-    "reviewer",
-    "ISO date",
-    "runtime authorization",
+    "reviewer identity",
+    "ISO review date",
+    "future tests-first runtime authorization status",
 ]
 candidate_sources = [
     "SRC-MATRIX-CH5-LOADS-BETWEEN-NODES",

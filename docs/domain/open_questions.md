@@ -46,6 +46,8 @@ Each answer must identify source, edition/clause, interpretation, variables/unit
 
 `Q-LOAD-V2-001` remains open until the complete self-weight nodal distribution packet is reviewer-approved. The answer must not rely on `QTY-WEIGHT-001` alone: that trace is quantity-only evidence and does not decide nodal lumping, target nodes, directions/signs, runtime authorization, or software test expectations.
 
+For `LOAD-SW-DIST-001`, the mandatory ledger fields remain source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. Candidate inventory/arithmetic is not approved engineering evidence and does not authorize runtime execution.
+
 ### Matrix Structural Analysis review blockers for `Q-LOAD-V2-001`
 
 Matrix Structural Analysis is now candidate/supporting source evidence, but it does not close `Q-LOAD-V2-001`. The reviewer must still resolve the following before generated self-weight nodal loads can be considered for a future tests-first SDD:

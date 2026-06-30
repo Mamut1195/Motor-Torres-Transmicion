@@ -18,6 +18,23 @@ const TOTAL_WEIGHT_TRACE_ID: &str = "QTY-WEIGHT-001";
 const VALIDATION_EXAMPLES_DOC: &str = include_str!("../../../docs/domain/validation_examples.md");
 const FORMULAS_REGISTER_DOC: &str = include_str!("../../../docs/domain/formulas_register.md");
 const ACCEPTANCE_GATE_DOC: &str = include_str!("../../../docs/domain/acceptance_gate.md");
+const OPEN_QUESTIONS_DOC: &str = include_str!("../../../docs/domain/open_questions.md");
+const LOAD_SW_DIST_TRACE_ID: &str = "LOAD-SW-DIST-001";
+const MANDATORY_LOAD_SW_LEDGER_FIELDS: &[&str] = &[
+    "source rule",
+    "clause/project-rule ID",
+    "reviewer interpretation",
+    "assumptions",
+    "target nodes",
+    "signs/directions",
+    "units",
+    "applicability limits",
+    "numeric trace",
+    "tolerance rationale",
+    "reviewer identity",
+    "ISO review date",
+    "future tests-first runtime authorization status",
+];
 
 #[derive(Debug, Deserialize)]
 struct SourceExample {
@@ -35,6 +52,8 @@ struct SourceExample {
     candidate: Option<CandidateMetadata>,
     #[serde(default)]
     missing_approval_fields: Vec<String>,
+    #[serde(default)]
+    candidate_sources: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -147,6 +166,14 @@ fn is_execution_eligible(example: &SourceExample) -> Result<bool, String> {
     let approval = example.approval.as_ref().ok_or("approval is required")?;
     require_present(approval.reviewer.as_deref(), "approval.reviewer")?;
     require_present(approval.date.as_deref(), "approval.date")?;
+    if example.trace_ids.as_ref().is_some_and(|trace_ids| {
+        trace_ids
+            .iter()
+            .any(|trace_id| trace_id == LOAD_SW_DIST_TRACE_ID)
+    }) && !example.missing_approval_fields.is_empty()
+    {
+        return Err("runtime authorization is blocked until every LOAD-SW-DIST-001 approval field is complete".to_string());
+    }
     if example.expected.is_empty() {
         return Err("expected output records are required".to_string());
     }
@@ -351,6 +378,19 @@ fn require_present<'a>(value: Option<&'a str>, field: &str) -> Result<&'a str, S
     Ok(value)
 }
 
+fn assert_doc_contains_all_fields(doc_name: &str, doc: &str) {
+    assert!(
+        doc.contains(LOAD_SW_DIST_TRACE_ID),
+        "{doc_name} must trace {LOAD_SW_DIST_TRACE_ID}"
+    );
+    for field in MANDATORY_LOAD_SW_LEDGER_FIELDS {
+        assert!(
+            doc.contains(field),
+            "{doc_name} must document mandatory ledger field {field}"
+        );
+    }
+}
+
 #[test]
 fn metadata_validation_rejects_missing_required_fields() {
     let cases = [
@@ -424,7 +464,7 @@ fn blocked_matrix_fixture_preserves_manual_review_blockers_without_dispatch() {
     assert!(example
         .missing_approval_fields
         .iter()
-        .any(|field| field == "directions/signs"));
+        .any(|field| field == "signs/directions"));
     assert!(example
         .blocked_reason
         .as_deref()
@@ -500,6 +540,90 @@ fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
             "acceptance_gate.md must contain {required}"
         );
     }
+}
+
+#[test]
+fn docs_define_complete_load_sw_dist_non_runtime_approval_packet_ledger() {
+    assert_doc_contains_all_fields("formulas_register.md", FORMULAS_REGISTER_DOC);
+    assert_doc_contains_all_fields("validation_examples.md", VALIDATION_EXAMPLES_DOC);
+    assert_doc_contains_all_fields("acceptance_gate.md", ACCEPTANCE_GATE_DOC);
+    assert_doc_contains_all_fields("open_questions.md", OPEN_QUESTIONS_DOC);
+
+    for doc in [
+        FORMULAS_REGISTER_DOC,
+        VALIDATION_EXAMPLES_DOC,
+        ACCEPTANCE_GATE_DOC,
+        OPEN_QUESTIONS_DOC,
+    ] {
+        let doc_lower = doc.to_ascii_lowercase();
+        assert!(doc_lower
+            .contains("candidate inventory/arithmetic is not approved engineering evidence"));
+        assert!(doc_lower.contains("does not authorize runtime execution"));
+    }
+}
+
+#[test]
+fn self_weight_packet_missing_reviewer_interpretation_remains_candidate_only() {
+    let fixture = MATRIX_GATE_FIXTURE.replace("    \"reviewer interpretation\",\n", "");
+    let example = parse_fixture(&fixture).unwrap();
+
+    validate_metadata(&example).unwrap();
+    assert!(!is_execution_eligible(&example).unwrap());
+    assert!(!example
+        .missing_approval_fields
+        .iter()
+        .any(|field| field == "reviewer interpretation"));
+    assert!(example.candidate.is_some());
+    assert!(collect_actuals(&example)
+        .unwrap_err()
+        .contains("not executable"));
+}
+
+#[test]
+fn reviewer_identity_and_date_without_future_authorization_stay_non_executable() {
+    let fixture = format!(
+        "{}\n[approval]\nreviewer = \"Domain Reviewer\"\ndate = \"2026-06-30\"\n",
+        MATRIX_GATE_FIXTURE.replace(
+            "status = \"TODO_DOMAIN_VALIDATION\"",
+            "status = \"approved\"\nallowed_target = \"tower_core_truss_solver\"",
+        )
+    );
+    let example = parse_fixture(&fixture).unwrap();
+
+    let error = is_execution_eligible(&example).unwrap_err();
+
+    assert!(error.contains("runtime authorization"), "got {error}");
+    assert!(example.expected.is_empty());
+    assert!(example.model.is_none());
+}
+
+#[test]
+fn matrix_gate_fixture_records_every_approval_blocker_and_no_executable_fields() {
+    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
+
+    assert_eq!(example.status.as_deref(), Some("TODO_DOMAIN_VALIDATION"));
+    assert!(example.trace_ids.as_ref().is_some_and(|trace_ids| trace_ids
+        .iter()
+        .any(|trace_id| trace_id == LOAD_SW_DIST_TRACE_ID)));
+    assert!(example.allowed_target.is_none());
+    assert!(example.approval.is_none());
+    assert!(example.model.is_none());
+    assert!(example.expected.is_empty());
+    assert_eq!(
+        example.missing_approval_fields,
+        MANDATORY_LOAD_SW_LEDGER_FIELDS
+            .iter()
+            .map(|field| field.to_string())
+            .collect::<Vec<_>>()
+    );
+    assert_eq!(
+        example.candidate_sources,
+        vec![
+            "SRC-MATRIX-CH5-LOADS-BETWEEN-NODES".to_string(),
+            "SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS".to_string(),
+            "SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS".to_string(),
+        ]
+    );
 }
 
 #[test]

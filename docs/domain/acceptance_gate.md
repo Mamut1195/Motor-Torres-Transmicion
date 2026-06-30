@@ -137,6 +137,8 @@ Acceptance rule: candidate source rows in `standards_map.md` are inventory only.
 
 `LOAD-SW-DIST-001` and `example_09_self_weight_nodal_distribution_gate` remain `TODO_DOMAIN_VALIDATION`. This section is a blocked review checklist only; it does not approve generated nodal loads, provide a numeric example, name a reviewer/date, or authorize runtime work.
 
+Mandatory ledger fields for a complete non-runtime packet are: source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. Candidate inventory/arithmetic is not approved engineering evidence and does not authorize runtime execution.
+
 | Checklist item | Required before approval | Current gate state |
 |---|---|---|
 | Source / project rule | Standard, paper, project rule, or reviewer-owned rule packet that governs distribution from member self-weight quantity to nodes. | missing; blocked |

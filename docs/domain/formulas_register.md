@@ -64,6 +64,8 @@ Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATIO
 
 `LOAD-SW-DIST-001` remains `TODO_DOMAIN_VALIDATION` because the approval packet is incomplete. The existing `QTY-WEIGHT-001` validation proves only the total member self-weight quantity; it does not decide how that quantity is distributed, which nodes receive it, or which force directions/signs apply.
 
+Mandatory ledger fields for a complete non-runtime approval packet are: source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. Candidate inventory/arithmetic is not approved engineering evidence and does not authorize runtime execution.
+
 | Evidence field | Required value before approval | Current value | Gate state |
 |---|---|---|---|
 | Source / project rule | Governing standard, paper, project rule, or reviewer-owned packet for nodal distribution. | not recorded | blocked |
