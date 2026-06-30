@@ -15,6 +15,9 @@ const MATRIX_GATE_FIXTURE: &str =
 const SOLVER_TARGET: &str = "tower_core_truss_solver";
 const TOTAL_WEIGHT_TARGET: &str = "tower_core_total_weight_check";
 const TOTAL_WEIGHT_TRACE_ID: &str = "QTY-WEIGHT-001";
+const VALIDATION_EXAMPLES_DOC: &str = include_str!("../../../docs/domain/validation_examples.md");
+const FORMULAS_REGISTER_DOC: &str = include_str!("../../../docs/domain/formulas_register.md");
+const ACCEPTANCE_GATE_DOC: &str = include_str!("../../../docs/domain/acceptance_gate.md");
 
 #[derive(Debug, Deserialize)]
 struct SourceExample {
@@ -29,6 +32,7 @@ struct SourceExample {
     #[serde(default)]
     expected: Vec<ExpectedOutput>,
     blocked_reason: Option<String>,
+    candidate: Option<CandidateMetadata>,
     #[serde(default)]
     missing_approval_fields: Vec<String>,
 }
@@ -68,6 +72,16 @@ struct Tolerance {
     absolute: f64,
     relative: f64,
     rationale: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct CandidateMetadata {
+    status: String,
+    total_self_weight_kn: f64,
+    equal_end_lump_kn: f64,
+    boundary: String,
+    #[serde(default)]
+    unapproved_fields: Vec<String>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -403,6 +417,8 @@ fn blocked_matrix_fixture_preserves_manual_review_blockers_without_dispatch() {
 
     validate_metadata(&example).unwrap();
     assert!(!is_execution_eligible(&example).unwrap());
+    assert!(example.allowed_target.is_none());
+    assert!(example.approval.is_none());
     assert!(example.model.is_none());
     assert!(example.expected.is_empty());
     assert!(example
@@ -414,6 +430,76 @@ fn blocked_matrix_fixture_preserves_manual_review_blockers_without_dispatch() {
         .as_deref()
         .unwrap()
         .contains("manual PDF/equation/sign review"));
+}
+
+#[test]
+fn blocked_matrix_fixture_records_candidate_arithmetic_without_runtime_approval() {
+    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
+    let candidate = example
+        .candidate
+        .as_ref()
+        .expect("example_09 must record candidate-only arithmetic metadata");
+
+    assert_eq!(example.status.as_deref(), Some("TODO_DOMAIN_VALIDATION"));
+    assert_eq!(candidate.status, "candidate_only_unapproved");
+    assert_eq!(candidate.total_self_weight_kn, 0.153_964_405);
+    assert_eq!(candidate.equal_end_lump_kn, 0.076_982_202_5);
+    assert!(candidate.boundary.contains("candidate only"));
+    assert!(candidate.boundary.contains("not approved"));
+    assert!(candidate.boundary.contains("runtime authorization"));
+    for field in [
+        "axis/sign",
+        "target nodes",
+        "distribution factors",
+        "tolerance rationale",
+        "reviewer/date",
+        "runtime authorization",
+    ] {
+        assert!(
+            candidate
+                .unapproved_fields
+                .iter()
+                .any(|unapproved| unapproved == field),
+            "candidate metadata must keep {field} unapproved"
+        );
+    }
+}
+
+#[test]
+fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
+    for required in [
+        "total self-weight `0.153964405 kN`",
+        "equal-end candidate value `0.0769822025 kN`",
+        "review-only arithmetic",
+        "axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization remain unapproved",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(required),
+            "validation_examples.md must contain {required}"
+        );
+    }
+
+    for required in [
+        "candidate review values: total `0.153964405 kN`; equal-end lumping candidate `0.0769822025 kN` per end",
+        "not an approved formula, nodal distribution rule, load-generation rule, or runtime authorization",
+        "axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization",
+    ] {
+        assert!(
+            FORMULAS_REGISTER_DOC.contains(required),
+            "formulas_register.md must contain {required}"
+        );
+    }
+
+    for required in [
+        "candidate arithmetic does not authorize schema, CLI, runtime, reports, optimizer, examples, or executable tests",
+        "total `0.153964405 kN` and equal-end candidate `0.0769822025 kN` per end",
+        "no target-node, axis/sign, tolerance, reviewer/date, or runtime authorization may be inferred",
+    ] {
+        assert!(
+            ACCEPTANCE_GATE_DOC.contains(required),
+            "acceptance_gate.md must contain {required}"
+        );
+    }
 }
 
 #[test]

@@ -154,6 +154,8 @@ Acceptance rule: candidate source rows in `standards_map.md` are inventory only.
 
 Boundary rule: `QTY-WEIGHT-001` is quantity-only evidence. It validates a member self-weight quantity trace; it is not a nodal distribution rule, not a load-generation rule, and not authorization for schema, CLI, solver, reporting, optimizer, example, test, or data changes.
 
+Candidate arithmetic guard: total `0.153964405 kN` and equal-end candidate `0.0769822025 kN` per end may be recorded as review material only. This candidate arithmetic does not authorize schema, CLI, runtime, reports, optimizer, examples, or executable tests, and no target-node, axis/sign, tolerance, reviewer/date, or runtime authorization may be inferred from it.
+
 ### Matrix Structural Analysis candidate evidence guard
 
 Matrix Structural Analysis, Second Edition has been recorded as candidate/supporting evidence for equivalent nodal and work-equivalent load concepts. This does not change the gate decision: `LOAD-SW-DIST-001` and `example_09_self_weight_nodal_distribution_gate` remain `TODO_DOMAIN_VALIDATION`.

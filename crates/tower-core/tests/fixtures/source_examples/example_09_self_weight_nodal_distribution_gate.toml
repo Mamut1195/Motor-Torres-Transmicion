@@ -21,6 +21,20 @@ candidate_sources = [
     "SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS",
 ]
 
+[candidate]
+status = "candidate_only_unapproved"
+total_self_weight_kn = 0.153964405
+equal_end_lump_kn = 0.0769822025
+boundary = "candidate only; total self-weight and equal-end arithmetic are review material, not approved nodal loads; axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization are not approved"
+unapproved_fields = [
+    "axis/sign",
+    "target nodes",
+    "distribution factors",
+    "tolerance rationale",
+    "reviewer/date",
+    "runtime authorization",
+]
+
 [source]
 document = "docs/domain/validation_examples.md"
 section = "Blocked review checklist: example_09_self_weight_nodal_distribution_gate"

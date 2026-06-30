@@ -218,6 +218,8 @@ Placeholder rule: every row in this section remains `TODO_DOMAIN_VALIDATION`. Ca
 
 Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a numeric validation example, not an executable fixture, and not approval for generated self-weight nodal loads.
 
+Candidate arithmetic: the approved quantity-only trace provides total self-weight `0.153964405 kN`. Under an unapproved equal-end lumping assumption, the review-only arithmetic records an equal-end candidate value `0.0769822025 kN` at each end. These values are reviewer material only: axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization remain unapproved.
+
 | Field | Required content for future acceptance | Current value |
 |---|---|---|
 | Source / project rule | Governing standard, paper, project rule, or reviewer-owned packet for distributing member self-weight to nodes. | not approved |
@@ -230,7 +232,7 @@ Status: `TODO_DOMAIN_VALIDATION`. This is a checklist/template only. It is not a
 | Directions / signs | Coordinate direction, sign convention, and force component mapping for each target node. | not approved |
 | Variables / units | Input variables, output variables, unit conversions, and output nodal force units. | not approved |
 | Applicability / limits | Member categories, geometry assumptions, exclusions, and any source-backed limits. | not approved |
-| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | not approved |
+| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | review-only arithmetic exists for total self-weight `0.153964405 kN` and equal-end candidate value `0.0769822025 kN`; not approved |
 | Tolerance / rationale | Comparison tolerance and rationale if this later becomes a test fixture. | not approved |
 | Reviewer / ISO date | Human reviewer identity and ISO date for the full packet. | not approved |
 | Runtime authorization | Future SDD change that writes tests before any runtime load-generation implementation. | not approved |
@@ -249,7 +251,7 @@ Matrix Structural Analysis is relevant source inventory for a future accepted ex
 | `SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS` | Ch. 5 §5.2, Fig. 5.6, Table 5.1, Eq. 5.21; exploration pointer: book pp. 110-112 / PDF pp. 131-133 | Review equivalent nodal load treatment from fixed-end/reversed fixed-end force concepts. | Equations/signs require manual PDF review; frame/beam evidence cannot be blindly mapped to axial truss members. |
 | `SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Ch. 7 §7.5, Eq. 7.32; exploration pointer: book pp. 194-196 / PDF pp. 215-217 | Review effective/work-equivalent nodal load derivation and the explored uniformly loaded axial member apportionment note. | Reviewer must manually verify the equation/signs and decide whether it applies to gravity self-weight in the project coordinate convention. |
 
-No numeric values are approved for `example_09_self_weight_nodal_distribution_gate`. A future accepted example must still provide reviewer-approved inputs, substitutions, intermediate values, expected nodal forces, tolerance/rationale, trace ID, reviewer identity, ISO date, and runtime authorization through a future tests-first SDD.
+No numeric nodal-load values are approved for `example_09_self_weight_nodal_distribution_gate`. The candidate total and equal-end arithmetic above does not infer axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, or runtime authorization. A future accepted example must still provide reviewer-approved inputs, substitutions, intermediate values, expected nodal forces, tolerance/rationale, trace ID, reviewer identity, ISO date, and runtime authorization through a future tests-first SDD.
 
 ## Failed-run examples
 

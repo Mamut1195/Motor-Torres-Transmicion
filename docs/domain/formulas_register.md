@@ -74,12 +74,14 @@ Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATIO
 | Directions / signs | Coordinate direction, sign convention, and force component mapping. | not recorded | blocked |
 | Variables / units | Inputs, outputs, unit conversions, and gravity convention if applicable. | quantity inputs exist for `QTY-WEIGHT-001`; distribution variables are not approved | blocked |
 | Applicability / limits | Scope, member/load categories, exclusions, and source-backed limits. | not recorded | blocked |
-| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | not recorded | blocked |
+| Numeric example | Inputs, substitutions, intermediate values, expected nodal force result, and trace ID. | candidate review values: total `0.153964405 kN`; equal-end lumping candidate `0.0769822025 kN` per end; not an approved formula, nodal distribution rule, load-generation rule, or runtime authorization | blocked |
 | Tolerance / rationale | Future software-comparison tolerance and rationale. | not recorded | blocked |
 | Reviewer / ISO date | Reviewer identity and ISO date covering the complete packet. | not recorded | blocked |
 | Runtime authorization | Explicit future SDD that converts the approved packet into tests before implementation. | not recorded | blocked |
 
 Runtime guard: this row must not be converted into Rust runtime behavior, schemas, CLI options, solver logic, reports, optimizer constraints, examples, data, or tests while any field remains blocked.
+
+Missing approval packet: axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization remain required before any executable interpretation of `LOAD-SW-DIST-001`.
 
 #### `LOAD-SW-DIST-001` Matrix Structural Analysis candidate evidence
 
