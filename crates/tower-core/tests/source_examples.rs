@@ -1,15 +1,20 @@
 use std::path::Path;
 
 use serde::Deserialize;
-use tower_core::analysis::TrussSolver;
+use tower_core::analysis::{AnalysisResult, TrussSolver};
+use tower_core::design_checks::{CheckEngine, CheckRule, FormulaStatus};
 use tower_core::loads::LoadCaseId;
 use tower_core::model::TowerModel;
 
 const SIMPLE_BAR_FIXTURE: &str =
     include_str!("fixtures/source_examples/example_01_simple_bar.toml");
+const MEMBER_WEIGHT_FIXTURE: &str =
+    include_str!("fixtures/source_examples/example_05_member_weight_quantity.toml");
 const MATRIX_GATE_FIXTURE: &str =
     include_str!("fixtures/source_examples/example_09_self_weight_nodal_distribution_gate.toml");
-const ALLOWED_TARGET: &str = "tower_core_truss_solver";
+const SOLVER_TARGET: &str = "tower_core_truss_solver";
+const TOTAL_WEIGHT_TARGET: &str = "tower_core_total_weight_check";
+const TOTAL_WEIGHT_TRACE_ID: &str = "QTY-WEIGHT-001";
 
 #[derive(Debug, Deserialize)]
 struct SourceExample {
@@ -20,6 +25,7 @@ struct SourceExample {
     source: Option<SourceTrace>,
     approval: Option<Approval>,
     model: Option<ModelTarget>,
+    evidence_boundary: Option<String>,
     #[serde(default)]
     expected: Vec<ExpectedOutput>,
     blocked_reason: Option<String>,
@@ -99,6 +105,7 @@ fn validate_metadata(example: &SourceExample) -> Result<(), String> {
         let approval = example.approval.as_ref().ok_or("approval is required")?;
         require_present(approval.reviewer.as_deref(), "approval.reviewer")?;
         require_present(approval.date.as_deref(), "approval.date")?;
+        validate_quantity_boundary(example)?;
         for (index, expected) in example.expected.iter().enumerate() {
             let tolerance = expected
                 .tolerance
@@ -133,10 +140,41 @@ fn is_execution_eligible(example: &SourceExample) -> Result<bool, String> {
         return Err("model is required".to_string());
     }
     match example.allowed_target.as_deref() {
-        Some(ALLOWED_TARGET) => Ok(true),
+        Some(SOLVER_TARGET | TOTAL_WEIGHT_TARGET) => Ok(true),
         Some(_) => Err("allowed_target is not whitelisted".to_string()),
         None => Err("allowed_target is required".to_string()),
     }
+}
+
+fn validate_quantity_boundary(example: &SourceExample) -> Result<(), String> {
+    if !example.trace_ids.as_ref().is_some_and(|trace_ids| {
+        trace_ids
+            .iter()
+            .any(|trace_id| trace_id == TOTAL_WEIGHT_TRACE_ID)
+    }) {
+        return Ok(());
+    }
+
+    if example.allowed_target.as_deref() == Some(SOLVER_TARGET) {
+        return Ok(());
+    }
+
+    let boundary = require_present(example.evidence_boundary.as_deref(), "evidence_boundary")?;
+    let boundary_lower = boundary.to_ascii_lowercase();
+    if !boundary_lower.contains("quantity-only") {
+        return Err("evidence_boundary must state quantity-only approval".to_string());
+    }
+
+    for forbidden in ["approves", "authorizes", "approved"] {
+        if boundary_lower.contains(forbidden) {
+            return Err(
+                "evidence_boundary must not approve distribution or runtime generation claims"
+                    .to_string(),
+            );
+        }
+    }
+
+    Ok(())
 }
 
 fn execute_fixture(example: &SourceExample) -> Result<(), String> {
@@ -167,30 +205,70 @@ fn collect_actuals(example: &SourceExample) -> Result<Vec<ActualOutput>, String>
     let model_text = std::fs::read_to_string(&model_path)
         .map_err(|error| format!("failed to read {}: {error}", model_path.display()))?;
     let model = TowerModel::from_toml_str(&model_text).map_err(|error| error.to_string())?;
-    let result = TrussSolver::solve(&model, &LoadCaseId(model_target.load_case.clone()))
+    let solver_result = if example.allowed_target.as_deref() == Some(SOLVER_TARGET) {
+        Some(
+            TrussSolver::solve(&model, &LoadCaseId(model_target.load_case.clone()))
+                .map_err(|error| error.to_string())?,
+        )
+    } else {
+        None
+    };
+    let design_check = if example.allowed_target.as_deref() == Some(TOTAL_WEIGHT_TARGET) {
+        let analysis = AnalysisResult {
+            displacements: Vec::new(),
+            reactions: Vec::new(),
+            member_forces: Vec::new(),
+        };
+        let results = CheckEngine::run(
+            &model,
+            &analysis,
+            &[CheckRule::TotalWeight {
+                trace_id: TOTAL_WEIGHT_TRACE_ID,
+                formula_status: FormulaStatus::Validated,
+            }],
+        )
         .map_err(|error| error.to_string())?;
+        Some(
+            results
+                .into_iter()
+                .next()
+                .ok_or_else(|| "missing total weight check result".to_string())?,
+        )
+    } else {
+        None
+    };
 
     let mut actuals = Vec::new();
     for expected in &example.expected {
         let value = match (expected.kind.as_str(), expected.component.as_str()) {
             ("displacement", "ux_m") => {
-                result
+                solver_result
+                    .as_ref()
+                    .ok_or_else(|| "solver result is required".to_string())?
                     .displacement(required_output_id(expected)?)
                     .ok_or_else(|| "missing displacement".to_string())?
                     .ux_m
             }
             ("reaction", "fx_kn") => {
-                result
+                solver_result
+                    .as_ref()
+                    .ok_or_else(|| "solver result is required".to_string())?
                     .reaction(required_output_id(expected)?)
                     .ok_or_else(|| "missing reaction".to_string())?
                     .fx_kn
             }
             ("member_force", "axial_kn") => {
-                result
+                solver_result
+                    .as_ref()
+                    .ok_or_else(|| "solver result is required".to_string())?
                     .member_force(required_output_id(expected)?)
                     .ok_or_else(|| "missing member force".to_string())?
                     .axial_kn
             }
+            ("design_check", "total_weight_kn") => design_check
+                .as_ref()
+                .and_then(|result| result.value)
+                .ok_or_else(|| "missing total weight check value".to_string())?,
             _ => {
                 return Err(format!(
                     "unsupported expected output {}.{}",
@@ -228,6 +306,13 @@ fn assert_within_tolerance(
 }
 
 fn expected_label(expected: &ExpectedOutput) -> Result<String, String> {
+    if expected.kind == "design_check" && expected.component == "total_weight_kn" {
+        return Ok(format!(
+            "design_check:{TOTAL_WEIGHT_TRACE_ID}:{}",
+            expected.component
+        ));
+    }
+
     Ok(format!(
         "{}:{}:{}",
         expected.kind,
@@ -350,6 +435,93 @@ fn incomplete_approved_fixtures_fail_before_numeric_comparison() {
         assert!(
             error.contains(expected_error),
             "expected {expected_error}, got {error}"
+        );
+    }
+}
+
+#[test]
+fn approved_member_weight_quantity_executes_total_weight_check_and_is_stable() {
+    let example = parse_fixture(MEMBER_WEIGHT_FIXTURE).unwrap();
+    validate_metadata(&example).unwrap();
+    assert!(is_execution_eligible(&example).unwrap());
+
+    let first = collect_actuals(&example).unwrap();
+    let second = collect_actuals(&example).unwrap();
+
+    assert_eq!(first, second);
+    assert_eq!(
+        first,
+        vec![ActualOutput {
+            label: "design_check:QTY-WEIGHT-001:total_weight_kn".to_string(),
+            value: 0.153_964_405,
+        }]
+    );
+    execute_fixture(&example).unwrap();
+}
+
+#[test]
+fn incomplete_member_weight_quantity_approval_fails_closed_before_execution() {
+    let cases = [
+        (
+            MEMBER_WEIGHT_FIXTURE.replace("reviewer = \"Jonnathan\"\n", ""),
+            "approval.reviewer",
+        ),
+        (
+            MEMBER_WEIGHT_FIXTURE.replace("date = \"2026-06-29\"\n", ""),
+            "approval.date",
+        ),
+        (
+            MEMBER_WEIGHT_FIXTURE.replace("[source]\n", "[missing_source]\n"),
+            "source",
+        ),
+        (
+            MEMBER_WEIGHT_FIXTURE.replace("[model]\n", "[missing_model]\n"),
+            "model",
+        ),
+        (
+            MEMBER_WEIGHT_FIXTURE
+                .replace("allowed_target = \"tower_core_total_weight_check\"\n", ""),
+            "allowed_target",
+        ),
+        (
+            MEMBER_WEIGHT_FIXTURE.replace(
+                "rationale = \"QTY-WEIGHT-001 deterministic member self-weight quantity\"",
+                "rationale = \"\"",
+            ),
+            "tolerance.rationale",
+        ),
+    ];
+
+    for (fixture, expected_error) in cases {
+        let example = parse_fixture(&fixture).unwrap();
+        let error = is_execution_eligible(&example).unwrap_err();
+        assert!(
+            error.contains(expected_error),
+            "expected {expected_error}, got {error}"
+        );
+    }
+}
+
+#[test]
+fn member_weight_quantity_rejects_distribution_or_runtime_generation_claims() {
+    for forbidden_claim in [
+        "approves nodal distribution",
+        "approves target nodes",
+        "approves signs",
+        "approves distribution factors",
+        "authorizes runtime self-weight generation",
+    ] {
+        let fixture = MEMBER_WEIGHT_FIXTURE.replace(
+            "quantity-only; no nodal distribution, target nodes, signs, distribution factors, or runtime self-weight generation",
+            forbidden_claim,
+        );
+        let example = parse_fixture(&fixture).unwrap();
+
+        let error = validate_metadata(&example).unwrap_err();
+
+        assert!(
+            error.contains("evidence_boundary"),
+            "expected boundary rejection for {forbidden_claim}, got {error}"
         );
     }
 }

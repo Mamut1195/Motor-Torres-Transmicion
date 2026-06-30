@@ -12,7 +12,7 @@ All proposed numeric fixtures use SI-derived project units: length in `m`, force
 | `example_02_simple_3d_truss_star` | Validate 3D DOF mapping, support application, reactions, and member axial forces on a small stable axial-star truss. | Reference displacements, reactions, and axial forces match the accepted fixture within the WU3 tolerance policy. | Independently proven in WU3 Strict TDD tests. |
 | `example_03_singular_unstable_model` | Validate singular or unstable model rejection. | Insufficient supports or disconnected member input is rejected with a deterministic instability error and failed-run report trace. | Fixture pending; expected outcome is rejection, not auto-repair. |
 | `example_04_units_input_validation` | Preserve WU2 validation behavior. | Missing/ambiguous units, duplicate IDs, and unknown references continue to fail with field-specific errors. | Covered by WU2 tests; keep as regression evidence. |
-| `example_05_member_weight_quantity` | Validate non-normative total member self-weight quantity trace. | `density * area * length * g / 1000` returns deterministic `kN` total weight and maps to `QTY-WEIGHT-001`. | Covered by WU4 Strict TDD tests. |
+| `example_05_member_weight_quantity` | Validate non-normative total member self-weight quantity trace. | `density * area * length * g / 1000` returns deterministic `kN` total weight and maps to `QTY-WEIGHT-001`. | Source-example approved for quantity evidence only; covered by WU4 Strict TDD tests and the source-example harness. |
 | `example_06_tension_axial_stress_utilization` | Validate preliminary tension axial stress utilization trace. | `stress_mpa = abs(P_kN) / A_m2 / 1000` and `utilization = stress_mpa / Fy_MPa` map to `CHK-TENSION-001`. | Covered by validated-member-checks-v1 Strict TDD tests. |
 | `example_07_compression_axial_stress_utilization` | Validate preliminary compression axial stress utilization trace without buckling claims. | `stress_mpa = abs(P_kN) / A_m2 / 1000` and `utilization = stress_mpa / Fy_MPa` map to `CHK-COMPRESSION-001`. | Covered by validated-member-checks-v1 Strict TDD tests. |
 | `example_08_slenderness_effective_length_gate` | Define the required accepted-example shape before any `CHK-SLENDERNESS-001` implementation. | Must state length basis, `K` if applicable, axis-specific radii, units, member category, compression applicability, semantic choice (`L/r`, `K·L/r`, or blocked-only), expected output, trace ID, source clause, and reviewer/date. It must not contain pass/fail compliance unless the docs gate approves the source-backed limit. | Required but not approved; `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION`. |
@@ -91,7 +91,7 @@ Expected numeric values for `example_01_simple_bar` and `example_02_simple_3d_tr
 
 ## Preliminary quantity fixture: `example_05_member_weight_quantity`
 
-Status: independently proven in WU4 Strict TDD tests.
+Status: source-example approved for quantity evidence only; independently proven in WU4 Strict TDD tests.
 
 This fixture validates only member self-weight quantity tracing. It is not a normative design check and must not be used as a final engineering design acceptance criterion.
 
@@ -112,7 +112,7 @@ This fixture validates only member self-weight quantity tracing. It is not a nor
 | Member mass `ρAL` | `15.7` | `kg` | `QTY-WEIGHT-001` |
 | Member self-weight `ρALg / 1000` | `0.153964405` | `kN` | `QTY-WEIGHT-001` |
 
-Proof note: `crates/tower-core/tests/design_checks.rs` references `example_05_member_weight_quantity` and `QTY-WEIGHT-001`. Normative tension, compression, slenderness, and displacement checks remain blocked as `TODO_DOMAIN_VALIDATION` until approved formula-register entries and tests exist.
+Proof note: `crates/tower-core/tests/design_checks.rs` references `example_05_member_weight_quantity` and `QTY-WEIGHT-001`. `crates/tower-core/tests/fixtures/source_examples/example_05_member_weight_quantity.toml` also approves this fixture for source-example harness execution of `tower_core_total_weight_check` only. This approval does not authorize nodal distribution, target nodes, signs, distribution factors, Matrix-derived formulas, or runtime self-weight load generation. Normative tension, compression, slenderness, and displacement checks remain blocked as `TODO_DOMAIN_VALIDATION` until approved formula-register entries and tests exist.
 
 ### Minimum Load Model v1 reporting use
 

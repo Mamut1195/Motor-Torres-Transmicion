@@ -1,0 +1,26 @@
+id = "example_05_member_weight_quantity"
+status = "approved"
+trace_ids = ["QTY-WEIGHT-001"]
+allowed_target = "tower_core_total_weight_check"
+evidence_boundary = "quantity-only; no nodal distribution, target nodes, signs, distribution factors, or runtime self-weight generation"
+
+[source]
+document = "docs/domain/validation_examples.md"
+section = "Preliminary quantity fixture: example_05_member_weight_quantity"
+page = "validation_examples.md#example_05_member_weight_quantity"
+equation = "density * area * length * g / 1000"
+
+[approval]
+reviewer = "Jonnathan"
+date = "2026-06-29"
+
+[model]
+path = "example_05_member_weight_quantity_model.toml"
+load_case = "axial"
+
+[[expected]]
+kind = "design_check"
+component = "total_weight_kn"
+value = 0.153964405
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "QTY-WEIGHT-001 deterministic member self-weight quantity" }
