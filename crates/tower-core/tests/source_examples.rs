@@ -20,6 +20,7 @@ const VALIDATION_EXAMPLES_DOC: &str = include_str!("../../../docs/domain/validat
 const FORMULAS_REGISTER_DOC: &str = include_str!("../../../docs/domain/formulas_register.md");
 const ACCEPTANCE_GATE_DOC: &str = include_str!("../../../docs/domain/acceptance_gate.md");
 const OPEN_QUESTIONS_DOC: &str = include_str!("../../../docs/domain/open_questions.md");
+const STANDARDS_MAP_DOC: &str = include_str!("../../../docs/domain/standards_map.md");
 const LOAD_SW_DIST_TRACE_ID: &str = "LOAD-SW-DIST-001";
 const LOAD_SW_DIST_CIVIL_RAG_SOURCE_IDS: &[&str] = &[
     "SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS",
@@ -53,6 +54,29 @@ const MANDATORY_SLENDERNESS_PACKET_FIELDS: &[&str] = &[
     "reviewer identity",
     "ISO approval date",
     "future tests-first runtime authorization status",
+];
+const SLENDERNESS_CIVIL_RAG_SOURCE_IDS: &[&str] = &[
+    "6fb62a89-2654-4c75-bbda-57e4d88ab610",
+    "87c3e208-51b6-4838-930a-45c3331893f1",
+    "6eb7b9e4-100f-4a2c-89fb-c7d7975ca39c",
+    "7d04473e-3b0b-47db-9492-46a43aeab525",
+    "dfa21e97-4af4-422d-9b7c-6c1850117dea",
+    "051f5339-d2a7-4f72-b2d7-1e3b99fd1be0",
+    "5817f4ec-d28b-4f86-8a33-fed63dfb7ea5",
+    "d78b4be5-e1d6-4ed0-aea6-f8a279619248",
+    "bb74de97-a8b0-4b5d-a81e-c19a7d5fb0a3",
+    "8f733827-febd-4672-98b7-9050d6f2b05a",
+    "74402c38-ca86-4a58-9af5-447f16505003",
+    "dadf682b-a9fa-4ecb-8170-c991c205c165",
+];
+const SLENDERNESS_LEDGER_REQUIRED_FIELDS: &[&str] = &[
+    "civil-rag source ID",
+    "standard/source identity",
+    "section",
+    "excerpt / meaning",
+    "candidate semantics",
+    "source type",
+    "approval boundary",
 ];
 
 #[derive(Debug, Deserialize)]
@@ -797,8 +821,9 @@ fn slenderness_docs_define_complete_non_runtime_source_approval_packet() {
     }
 
     for required in [
-        "civil-rag/Postgres unavailable",
-        "equivalent manual source review",
+        "retrieval resolved",
+        "reviewer approval remains missing",
+        "runtime authorization remains missing",
         "separate tests-first runtime authorization is required",
         "must not authorize Rust runtime slenderness computation",
     ] {
@@ -816,6 +841,51 @@ fn slenderness_docs_define_complete_non_runtime_source_approval_packet() {
         assert!(
             VALIDATION_EXAMPLES_DOC.contains(forbidden_runtime_claim),
             "validation_examples.md must preserve non-runtime slenderness guard: {forbidden_runtime_claim}"
+        );
+    }
+}
+
+#[test]
+fn slenderness_docs_record_civil_rag_source_evidence_ledger_without_runtime_approval() {
+    for field in SLENDERNESS_LEDGER_REQUIRED_FIELDS {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(field),
+            "validation_examples.md must document slenderness ledger field {field}"
+        );
+    }
+
+    for source_id in SLENDERNESS_CIVIL_RAG_SOURCE_IDS {
+        for (doc_name, doc) in [
+            ("standards_map.md", STANDARDS_MAP_DOC),
+            ("validation_examples.md", VALIDATION_EXAMPLES_DOC),
+        ] {
+            assert!(
+                doc.contains(source_id),
+                "{doc_name} must record slenderness civil-rag source {source_id}"
+            );
+        }
+    }
+
+    for source_type in ["`primary`", "`commentary`", "`example`"] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(source_type),
+            "validation_examples.md must distinguish source type {source_type}"
+        );
+    }
+
+    for required_boundary in [
+        "retrieval resolved",
+        "reviewer approval remains missing",
+        "runtime authorization remains missing",
+        "capacity-related excerpts are excluded evidence boundaries only",
+        "no runtime `civil-rag` dependency",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(required_boundary)
+                || FORMULAS_REGISTER_DOC.contains(required_boundary)
+                || ACCEPTANCE_GATE_DOC.contains(required_boundary)
+                || OPEN_QUESTIONS_DOC.contains(required_boundary),
+            "domain docs must preserve slenderness boundary wording: {required_boundary}"
         );
     }
 }

@@ -65,7 +65,7 @@ Matrix Structural Analysis is now candidate/supporting source evidence, but it d
 
 ### `CHK-SLENDERNESS-001` blocker checklist
 
-The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.
+The previous `civil-rag` source-retrieval blocker is retrieval resolved by the ASCE 10-15 source evidence ledger. The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve reviewer approval or runtime authorization.
 
 The required answer packet must include semantic choice; exact source title/edition/clause/page or source ID; inputs with units; applicability; limits if any; numeric example if available; tolerance rationale; reviewer identity; ISO approval date; and future tests-first runtime authorization status. An equivalent manual source review can satisfy these fields only when it supplies the same clause traceability and reviewer-owned interpretation as source retrieval.
 
@@ -77,6 +77,7 @@ The required answer packet must include semantic choice; exact source title/edit
 | Required inputs | Member length basis, `K` if applicable, axis radii policy, bracing/end-condition assumptions, units | open |
 | Accepted example | Inputs, expression, intermediate values, expected result, tolerance/rationale, trace ID, and clause | open |
 | Reviewer / date | Reviewer identity and ISO approval date covering the full evidence packet | open |
+| Runtime authorization | Future tests-first runtime authorization status after a complete reviewer-approved evidence packet exists | open |
 
 Until all rows are resolved, `CHK-SLENDERNESS-001` stays `TODO_DOMAIN_VALIDATION` and blocked for source, schema, CLI, tests, reports, optimizer feasibility, and runtime behavior.
 

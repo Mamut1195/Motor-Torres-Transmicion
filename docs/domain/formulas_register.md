@@ -142,6 +142,12 @@ Before any implementation can be approved, the domain gate must record:
 
 Current documentation state: `blocked-only`. This is a guardrail, not an approved runtime formula. It intentionally prevents source, schema, CLI, test, reporting, optimizer, or runtime behavior from depending on unapproved slenderness semantics.
 
+#### `CHK-SLENDERNESS-001` civil-rag retrieval evidence status
+
+The prior source-retrieval blocker is retrieval resolved for ASCE 10-15 evidence recorded in `standards_map.md` and `validation_examples.md`. Reviewer approval remains missing and runtime authorization remains missing. The formula status stays `TODO_DOMAIN_VALIDATION`; the ledger does not approve `L/r`, `K·L/r`, limits, pass/fail compliance, buckling, Euler/column capacity, optimizer feasibility, final-design claims, schema expansion, or runtime `civil-rag` dependency.
+
+Capacity-related excerpts are excluded evidence boundaries only. Retrieved mentions of Euler behavior, `Fa`, compression stress formulas, column capacity, design strength, or appendix numeric fragments may be cited as boundary evidence, but they are not acceptance fixtures and must not become executable checks.
+
 ## Source-to-test traceability convention
 
 - Formula/register IDs must appear in tests and report traces once formulas exist.
