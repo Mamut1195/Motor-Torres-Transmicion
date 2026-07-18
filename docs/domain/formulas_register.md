@@ -117,6 +117,8 @@ These rows are candidate evidence only and cannot authorize runtime generated lo
 
 `CHK-SLENDERNESS-001` remains blocked as `TODO_DOMAIN_VALIDATION`. Documentation, reports, optimizers, and future implementation proposals must not treat it as pass/fail compliance, final design evidence, or feasibility evidence until the formula-register row is replaced by a reviewer-approved, source-backed status.
 
+Mandatory non-runtime approval packet fields are: semantic choice; exact source title/edition/clause/page or source ID; inputs with units; applicability; limits if any; numeric example if available; tolerance rationale; reviewer identity; ISO approval date; and future tests-first runtime authorization status. Missing any field keeps the packet blocked and does not authorize Rust runtime slenderness computation.
+
 Before any implementation can be approved, the domain gate must record:
 
 - whether the checked quantity is geometric `L/r`, effective `K·L/r`, or intentionally blocked-only;
@@ -136,6 +138,7 @@ Before any implementation can be approved, the domain gate must record:
 | Limits and applicability | Source-backed limit(s), exclusions, member categories, and whether any threshold supports later reporting | No approved limit or applicability rule exists; no compliance threshold may be inferred | blocked |
 | Accepted numeric example | Inputs, expression, intermediate values, result, tolerance/rationale, trace ID, clause, reviewer, and ISO date | `example_08_slenderness_effective_length_gate` is a non-accepted template only | blocked |
 | Reviewer approval | Reviewer identity plus ISO approval date for clauses, semantic choice, limits, and example | not approved | blocked |
+| Runtime authorization | Explicit future tests-first runtime authorization status after a complete evidence packet is approved | not approved; a separate tests-first runtime authorization is required | blocked |
 
 Current documentation state: `blocked-only`. This is a guardrail, not an approved runtime formula. It intentionally prevents source, schema, CLI, test, reporting, optimizer, or runtime behavior from depending on unapproved slenderness semantics.
 

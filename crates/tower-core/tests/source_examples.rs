@@ -41,6 +41,19 @@ const MANDATORY_LOAD_SW_LEDGER_FIELDS: &[&str] = &[
     "ISO review date",
     "future tests-first runtime authorization status",
 ];
+const SLENDERNESS_TRACE_ID: &str = "CHK-SLENDERNESS-001";
+const MANDATORY_SLENDERNESS_PACKET_FIELDS: &[&str] = &[
+    "semantic choice",
+    "exact source title/edition/clause/page or source ID",
+    "inputs with units",
+    "applicability",
+    "limits if any",
+    "numeric example if available",
+    "tolerance rationale",
+    "reviewer identity",
+    "ISO approval date",
+    "future tests-first runtime authorization status",
+];
 
 #[derive(Debug, Deserialize)]
 struct SourceExample {
@@ -759,6 +772,51 @@ fn docs_define_complete_load_sw_dist_runtime_approval_packet_ledger() {
         let doc_lower = doc.to_ascii_lowercase();
         assert!(doc_lower.contains("approved narrow runtime rule"));
         assert!(doc_lower.contains("straight two-node axial member"));
+    }
+}
+
+#[test]
+fn slenderness_docs_define_complete_non_runtime_source_approval_packet() {
+    assert!(
+        FORMULAS_REGISTER_DOC.contains(SLENDERNESS_TRACE_ID),
+        "formulas_register.md must trace {SLENDERNESS_TRACE_ID}"
+    );
+
+    for field in MANDATORY_SLENDERNESS_PACKET_FIELDS {
+        for (doc_name, doc) in [
+            ("formulas_register.md", FORMULAS_REGISTER_DOC),
+            ("validation_examples.md", VALIDATION_EXAMPLES_DOC),
+            ("acceptance_gate.md", ACCEPTANCE_GATE_DOC),
+            ("open_questions.md", OPEN_QUESTIONS_DOC),
+        ] {
+            assert!(
+                doc.contains(field),
+                "{doc_name} must document mandatory slenderness approval field {field}"
+            );
+        }
+    }
+
+    for required in [
+        "civil-rag/Postgres unavailable",
+        "equivalent manual source review",
+        "separate tests-first runtime authorization is required",
+        "must not authorize Rust runtime slenderness computation",
+    ] {
+        assert!(
+            ACCEPTANCE_GATE_DOC.contains(required),
+            "acceptance_gate.md must preserve slenderness blocker wording: {required}"
+        );
+    }
+
+    for forbidden_runtime_claim in [
+        "not a numeric validation fixture",
+        "must not contain pass/fail compliance",
+        "must not be converted into a Rust test, runtime fixture, report output, optimizer constraint, or implementation formula",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(forbidden_runtime_claim),
+            "validation_examples.md must preserve non-runtime slenderness guard: {forbidden_runtime_claim}"
+        );
     }
 }
 

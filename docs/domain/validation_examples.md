@@ -152,6 +152,8 @@ Proof note: `crates/tower-core/tests/design_checks.rs` references `example_06_te
 
 Status: required but not approved. This section is a gate template only; it is not a numeric validation fixture and must not be used as implementation approval.
 
+Mandatory non-runtime approval packet fields are: semantic choice; exact source title/edition/clause/page or source ID; inputs with units; applicability; limits if any; numeric example if available; tolerance rationale; reviewer identity; ISO approval date; and future tests-first runtime authorization status. This template is blocked-only until all fields are reviewer-approved.
+
 Before `CHK-SLENDERNESS-001` can move beyond `TODO_DOMAIN_VALIDATION`, an accepted fixture must provide:
 
 | Required field | Purpose |
@@ -183,6 +185,7 @@ The following shape defines the evidence that a future reviewer must supply. It 
 | Trace ID | `CHK-SLENDERNESS-001` plus source clause trace ID(s) | not approved |
 | Source clause | Exact source, edition, clause/reference, and interpretation note | not approved |
 | Reviewer / date | Reviewer identity and ISO approval date | not approved |
+| Runtime authorization | Future tests-first runtime authorization status; a separate tests-first runtime authorization is required before any executable behavior | not approved |
 
 ### Placeholder status
 

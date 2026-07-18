@@ -199,6 +199,8 @@ Acceptance remains blocked until the complete reviewer-owned packet is recorded 
 
 Until every item is accepted, documentation may describe only the gap and required evidence. Runtime, schema, CLI, test, or source-code changes for slenderness remain out of scope for this gate.
 
+civil-rag/Postgres unavailable is an explicit blocker. The blocker may be cleared only by successful source retrieval or equivalent manual source review that records semantic choice; exact source title/edition/clause/page or source ID; inputs with units; applicability; limits if any; numeric example if available; tolerance rationale; reviewer identity; ISO approval date; and future tests-first runtime authorization status. Until then, the packet is blocked-only, a separate tests-first runtime authorization is required, and this gate must not authorize Rust runtime slenderness computation.
+
 ### `CHK-SLENDERNESS-001` non-runtime approval guard
 
 This docs-only evidence package does not approve or implement slenderness behavior. Source inventory, context references, placeholder examples, and unchecked gate items are not approval evidence.

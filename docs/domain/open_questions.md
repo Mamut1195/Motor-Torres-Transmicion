@@ -67,6 +67,8 @@ Matrix Structural Analysis is now candidate/supporting source evidence, but it d
 
 The following blockers remain open for `Q-DOM-003A`. Candidate source inventory does not resolve them.
 
+The required answer packet must include semantic choice; exact source title/edition/clause/page or source ID; inputs with units; applicability; limits if any; numeric example if available; tolerance rationale; reviewer identity; ISO approval date; and future tests-first runtime authorization status. An equivalent manual source review can satisfy these fields only when it supplies the same clause traceability and reviewer-owned interpretation as source retrieval.
+
 | Blocker | Required resolution | Current status |
 |---|---|---|
 | Governing source clauses | Exact source, edition, clause/reference, interpretation note, and trace ID | open |
