@@ -24,7 +24,7 @@ These questions remain open and must be reported as `TODO_DOMAIN_VALIDATION` unt
 
 | ID | Question | Current reporting status |
 |---|---|---|
-| Q-LOAD-001 | What approved lumping/modeling assumption converts `QTY-WEIGHT-001` member self-weight quantity into nodal loads? | `TODO_DOMAIN_VALIDATION`; no generated self-weight nodal loads. |
+| Q-LOAD-001 | What approved lumping/modeling assumption converts `QTY-WEIGHT-001` member self-weight quantity into nodal loads? | Resolved only for the approved narrow runtime rule: straight two-node axial member with uniform self-weight, target nodes `fixed/free`, z-up negative `fz`, endpoint `fz = -W/2`. All other self-weight generation remains `TODO_DOMAIN_VALIDATION`. |
 | Q-LOAD-002 | Which exact wind-loading clauses, inputs, exposure assumptions, and examples are approved? | `TODO_DOMAIN_VALIDATION`; no wind loading behavior. |
 | Q-LOAD-003 | Which conductor loading assumptions and source-backed examples are approved? | `TODO_DOMAIN_VALIDATION`; no conductor loading behavior. |
 | Q-LOAD-004 | Which load combinations and load factors are approved for MVP reports? | `TODO_DOMAIN_VALIDATION`; no combinations or factors. |
@@ -44,7 +44,9 @@ These questions are the required answer set for future load-model v2 work. Until
 
 Each answer must identify source, edition/clause, interpretation, variables/units, applicability/limits, assumptions, numeric example, tolerance/rationale if testable, reviewer, ISO date, and future SDD runtime authorization. Candidate-source inventory alone is not an answer.
 
-`Q-LOAD-V2-001` remains open until the complete self-weight nodal distribution packet is reviewer-approved. The answer must not rely on `QTY-WEIGHT-001` alone: that trace is quantity-only evidence and does not decide nodal lumping, target nodes, directions/signs, runtime authorization, or software test expectations.
+`Q-LOAD-V2-001` is closed only for the approved narrow runtime rule: straight two-node axial member with uniform self-weight, target nodes `fixed/free`, signs/directions `fz = -W/2`, units `kN`, reviewer Jonnathan, ISO date 2026-07-10, and tests-first runtime authorization. Candidate inventory/arithmetic is not approved engineering evidence for any broader scope and does not authorize runtime execution beyond this packet.
+
+Approved narrow runtime rule exclusions: nonuniform members, beam fixed-end actions, eccentric loads, wind/conductor loads, load combinations, load factors, controlling-case execution, and final engineering design claims remain open and blocked.
 
 For `LOAD-SW-DIST-001`, the mandatory ledger fields remain source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. Candidate inventory/arithmetic is not approved engineering evidence and does not authorize runtime execution.
 

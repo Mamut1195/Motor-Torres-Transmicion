@@ -52,13 +52,15 @@ This register separates source inventory from approval. Rows below are not appro
 
 | ID | Load topic | Candidate formula / rule | Status | Required approval evidence |
 |---|---|---|---|---|
-| `LOAD-SW-DIST-001` | Self-weight nodal distribution | Distribution of `QTY-WEIGHT-001` member self-weight quantity to model nodes. | TODO_DOMAIN_VALIDATION | Source/project rule; exact edition/clause or project-rule ID; reviewer interpretation; nodal distribution/lumping assumption; target nodes; directions/signs; variables/units; applicability/limits; reviewed numeric example with trace ID; tolerance/rationale; reviewer; ISO date; and explicit future SDD runtime authorization. |
+| `LOAD-SW-DIST-001` | Self-weight nodal distribution | approved runtime values: total `0.153964405 kN`; endpoint `fz = -0.0769822025 kN` at `fixed` and `free` from `W = density * area * length * g / 1000` and `fz = -W/2`. | validated for approved narrow runtime rule | Source-example fixture `example_09_self_weight_nodal_distribution_gate`, reviewer Jonnathan, ISO date 2026-07-10, target nodes `fixed/free`, z-up negative `fz`, tolerance, and explicit tests-first runtime authorization. nonuniform members, beam fixed-end actions, eccentric loads, wind/conductor loads, and load combinations remain excluded. |
 | `LOAD-WIND-001` | Wind loading | Wind-derived tower load calculation and mapping to analysis nodes. | TODO_DOMAIN_VALIDATION | Exact source clauses, exposure/input assumptions, variables/units, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-COND-001` | Conductor loads | Conductor-derived load assumptions and transfer to tower attachment nodes. | TODO_DOMAIN_VALIDATION | Source clauses/project rules, span/input assumptions, variables/units, load transfer interpretation, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-COMB-001` | Load combinations / factors | Combination membership and factor application for load cases. | TODO_DOMAIN_VALIDATION | Source/project rule, exact combinations/factors, variables/units, applicability/limits, numeric example showing combined values, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 | `LOAD-CTRL-001` | Controlling-case prerequisites | Deterministic rule for selecting or reporting controlling cases after approved combinations exist. | TODO_DOMAIN_VALIDATION | Approved prerequisite combination/factor evidence, controlling metric, tie-breaking/reporting semantics, applicability/limits, numeric example, tolerance/rationale, reviewer, ISO date, and explicit runtime authorization. |
 
 Approval rule: `candidate`, `pending`, `provisional`, and `TODO_DOMAIN_VALIDATION` are non-implementation states. Future code may reference a `LOAD-*` ID only after the row is replaced by a complete reviewer-approved evidence packet and a future SDD phase writes tests first.
+
+`LOAD-SW-DIST-001` is now approved only for the narrow runtime rule above: straight two-node axial member with uniform self-weight, equal endpoint allocation, and negative `fz`. No runtime `civil-rag` lookup, source interpretation, wind/conductor loading, eccentric load, beam fixed-end action, nonuniform load, load combination, or final-design claim is approved.
 
 ### `LOAD-SW-DIST-001` blocked packet guard
 
@@ -98,6 +100,18 @@ The following entries are candidate/supporting evidence only. They do not replac
 | `SRC-MATRIX-CH13-DEAD-LOAD-CONTEXT` | Ch. 13 dead-load mention; exploration pointer: book p. 410 / PDF p. 431 | Non-supporting context only. | Manual PDF page review required if cited further. | Does not define a self-weight generation or distribution rule. |
 
 Matrix approval blocker: extracted equations, signs, and page references remain untrusted until a human reviewer manually checks the PDF and records interpretation. `LOAD-SW-DIST-001` stays `TODO_DOMAIN_VALIDATION` until the complete approval packet is filled, including applicability to axial truss members, target nodes, directions/signs, reviewed numeric example, tolerance, reviewer identity, ISO date, and explicit future tests-first runtime authorization.
+
+#### `LOAD-SW-DIST-001` captured civil-rag candidate evidence
+
+The following `civil-rag` source identifiers are captured reviewer material only. They are not approved formulas, not source interpretation, and not runtime authorization. `LOAD-SW-DIST-001` remains `TODO_DOMAIN_VALIDATION` while the approval fields above are missing.
+
+| Candidate source ID | Captured excerpt / summary | Retrieval basis | Candidate relation | Approval impact |
+|---|---|---|---|---|
+| `SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS` | Tower self-weight context indicates member dead/self weight may be collected for review against structural joints or tributary points. | Captured `civil-rag` retrieval for self-weight, tower, nodal distribution, tributary joints, and member dead load. | Candidate context for why a reviewer may consider converting member self-weight quantity into nodal loads. | Does not approve target nodes, allocation factors, signs/directions, or generated load cases. |
+| `SRC-CIVIL-RAG-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Matrix Structural Analysis Ch. 7 work-equivalent load discussion may support effective nodal load reasoning after manual equation and applicability review. | Captured `civil-rag` retrieval for work-equivalent loads, axial member distributed load, and Matrix Structural Analysis Ch. 7 Eq. 7.32 context. | Candidate evidence closest to a possible distribution rule for a future reviewer-owned packet. | Does not approve applicability to axial truss self-weight, gravity direction, sign convention, tolerance, or runtime behavior. |
+| `SRC-CIVIL-RAG-MOP74-VERTICAL-AXIS-CONTEXT` | ASCE MOP 74 vertical-axis/sign context may help a reviewer document direction conventions. | Captured `civil-rag` retrieval for transmission tower vertical axis, gravity, sign convention, and load direction context. | Candidate sign/direction context only. | Does not approve force component mapping, signs, target nodes, or load generation. |
+
+These rows are candidate evidence only and cannot authorize runtime generated loads. Future approval still requires source rule, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability, numeric trace, tolerance rationale, reviewer identity, ISO review date, and explicit tests-first runtime authorization.
 
 ### `CHK-SLENDERNESS-001` evidence gate
 

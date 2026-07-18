@@ -1,44 +1,79 @@
 id = "example_09_self_weight_nodal_distribution_gate"
-status = "TODO_DOMAIN_VALIDATION"
+status = "approved"
 trace_ids = ["QTY-WEIGHT-001", "LOAD-SW-DIST-001"]
-blocked_reason = "Self-weight nodal distribution needs manual PDF/equation/sign review before runtime authorization."
-missing_approval_fields = [
-    "source rule",
-    "clause/project-rule ID",
-    "reviewer interpretation",
-    "assumptions",
-    "target nodes",
-    "signs/directions",
-    "units",
-    "applicability limits",
-    "numeric trace",
-    "tolerance rationale",
-    "reviewer identity",
-    "ISO review date",
-    "future tests-first runtime authorization status",
-]
+allowed_target = "runtime_load_generator"
+sign_convention = "z-up; self-weight acts in negative fz"
+runtime_authorization = "approved narrow runtime rule: straight two-node axial member with uniform self-weight only"
 candidate_sources = [
-    "SRC-MATRIX-CH5-LOADS-BETWEEN-NODES",
-    "SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS",
-    "SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS",
+    "SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS",
+    "SRC-CIVIL-RAG-MATRIX-CH7-WORK-EQUIVALENT-LOADS",
+    "SRC-CIVIL-RAG-MOP74-VERTICAL-AXIS-CONTEXT",
 ]
 
 [candidate]
-status = "candidate_only_unapproved"
+status = "approved_narrow_runtime_rule"
 total_self_weight_kn = 0.153964405
 equal_end_lump_kn = 0.0769822025
-boundary = "candidate only; total self-weight and equal-end arithmetic are review material, not approved nodal loads; axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization are not approved"
-unapproved_fields = [
-    "axis/sign",
-    "target nodes",
-    "distribution factors",
-    "tolerance rationale",
-    "reviewer/date",
-    "runtime authorization",
-]
+boundary = "approved narrow runtime rule; straight two-node axial member with uniform self-weight only; no nonuniform, beam fixed-end, eccentric, wind, conductor, or load-combination generation"
 
 [source]
 document = "docs/domain/validation_examples.md"
-section = "Blocked review checklist: example_09_self_weight_nodal_distribution_gate"
+section = "Approved runtime rule: example_09_self_weight_nodal_distribution_gate"
 page = "validation_examples.md#example_09_self_weight_nodal_distribution_gate"
-equation = "TODO_DOMAIN_VALIDATION"
+equation = "W = density * area * length * g / 1000; endpoint fz = -W/2"
+
+[approval]
+reviewer = "Jonnathan"
+date = "2026-07-10"
+
+[model]
+path = "example_05_member_weight_quantity_model.toml"
+load_case = "generated-self-weight"
+
+[[expected]]
+kind = "nodal_load"
+node_id = "fixed"
+component = "fx_kn"
+value = 0.0
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 zero lateral self-weight component" }
+
+[[expected]]
+kind = "nodal_load"
+node_id = "fixed"
+component = "fy_kn"
+value = 0.0
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 zero lateral self-weight component" }
+
+[[expected]]
+kind = "nodal_load"
+node_id = "fixed"
+component = "fz_kn"
+value = -0.0769822025
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 equal-end self-weight nodal load tolerance" }
+
+[[expected]]
+kind = "nodal_load"
+node_id = "free"
+component = "fx_kn"
+value = 0.0
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 zero lateral self-weight component" }
+
+[[expected]]
+kind = "nodal_load"
+node_id = "free"
+component = "fy_kn"
+value = 0.0
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 zero lateral self-weight component" }
+
+[[expected]]
+kind = "nodal_load"
+node_id = "free"
+component = "fz_kn"
+value = -0.0769822025
+unit = "kN"
+tolerance = { absolute = 1e-10, relative = 1e-7, rationale = "LOAD-SW-DIST-001 equal-end self-weight nodal load tolerance" }

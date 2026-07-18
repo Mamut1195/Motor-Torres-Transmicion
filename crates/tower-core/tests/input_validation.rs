@@ -1,5 +1,5 @@
 use tower_core::errors::TowerError;
-use tower_core::loads::LoadProvenanceStatus;
+use tower_core::loads::{LoadProvenanceStatus, SELF_WEIGHT_LOAD_CASE_ID};
 use tower_core::model::TowerModel;
 
 fn valid_model_toml() -> String {
@@ -55,6 +55,22 @@ fz = { value = 0.0, unit = "kN" }
     .to_string()
 }
 
+fn explicit_wind_case(model: &TowerModel) -> &tower_core::loads::LoadCase {
+    model
+        .load_cases
+        .iter()
+        .find(|load_case| load_case.id.0 == "wind")
+        .expect("explicit wind load case must be preserved")
+}
+
+fn generated_self_weight_case(model: &TowerModel) -> &tower_core::loads::LoadCase {
+    model
+        .load_cases
+        .iter()
+        .find(|load_case| load_case.id.0 == SELF_WEIGHT_LOAD_CASE_ID)
+        .expect("generated self-weight load case must be appended")
+}
+
 fn assert_unknown_reference(input: String, expected_field: &str, expected_id: &str) {
     let err = TowerModel::from_toml_str(&input).unwrap_err();
 
@@ -99,18 +115,18 @@ fn accepts_minimal_model_with_explicit_units() {
 fn defaults_existing_nodal_load_cases_to_explicit_user_input() {
     let model = TowerModel::from_toml_str(&valid_model_toml()).unwrap();
 
-    assert_eq!(model.load_cases.len(), 1);
-    assert_eq!(model.load_cases[0].id.0, "wind");
-    assert_eq!(
-        model.load_cases[0].status,
-        LoadProvenanceStatus::ExplicitUserInput
-    );
-    assert_eq!(model.load_cases[0].source, "user input");
-    assert_eq!(model.load_cases[0].nodal_loads.len(), 1);
-    assert_eq!(model.load_cases[0].nodal_loads[0].node_id.0, "n2");
-    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
-    assert_eq!(model.load_cases[0].nodal_loads[0].fy.get(), 0.0);
-    assert_eq!(model.load_cases[0].nodal_loads[0].fz.get(), 0.0);
+    assert_eq!(model.load_cases.len(), 2);
+    let explicit = explicit_wind_case(&model);
+    let generated = generated_self_weight_case(&model);
+    assert_eq!(explicit.id.0, "wind");
+    assert_eq!(explicit.status, LoadProvenanceStatus::ExplicitUserInput);
+    assert_eq!(explicit.source, "user input");
+    assert_eq!(explicit.nodal_loads.len(), 1);
+    assert_eq!(explicit.nodal_loads[0].node_id.0, "n2");
+    assert_eq!(explicit.nodal_loads[0].fx.get(), 1.0);
+    assert_eq!(explicit.nodal_loads[0].fy.get(), 0.0);
+    assert_eq!(explicit.nodal_loads[0].fz.get(), 0.0);
+    assert_eq!(generated.status, LoadProvenanceStatus::ValidatedQuantity);
 }
 
 #[test]
@@ -122,14 +138,13 @@ fn preserves_explicit_load_case_provenance_when_provided() {
 
     let model = TowerModel::from_toml_str(&input).unwrap();
 
-    assert_eq!(model.load_cases.len(), 1);
-    assert_eq!(
-        model.load_cases[0].status,
-        LoadProvenanceStatus::ExplicitUserInput
-    );
-    assert_eq!(model.load_cases[0].source, "field survey import");
-    assert_eq!(model.load_cases[0].nodal_loads[0].node_id.0, "n2");
-    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
+    assert_eq!(model.load_cases.len(), 2);
+    let explicit = explicit_wind_case(&model);
+    assert_eq!(explicit.status, LoadProvenanceStatus::ExplicitUserInput);
+    assert_eq!(explicit.source, "field survey import");
+    assert_eq!(explicit.nodal_loads[0].node_id.0, "n2");
+    assert_eq!(explicit.nodal_loads[0].fx.get(), 1.0);
+    assert_eq!(generated_self_weight_case(&model).nodal_loads.len(), 2);
 }
 
 #[test]
@@ -174,13 +189,15 @@ fz = { value = 0.0, unit = "kN" }
 
     let model = TowerModel::from_toml_str(&input).unwrap();
 
-    assert_eq!(model.load_cases.len(), 1);
-    assert_eq!(model.load_cases[0].id.0, "wind");
+    assert_eq!(model.load_cases.len(), 2);
+    let explicit = explicit_wind_case(&model);
+    assert_eq!(explicit.id.0, "wind");
+    assert_eq!(explicit.status, LoadProvenanceStatus::ExplicitUserInput);
+    assert_eq!(explicit.nodal_loads[0].fx.get(), 1.0);
     assert_eq!(
-        model.load_cases[0].status,
-        LoadProvenanceStatus::ExplicitUserInput
+        generated_self_weight_case(&model).status,
+        LoadProvenanceStatus::ValidatedQuantity
     );
-    assert_eq!(model.load_cases[0].nodal_loads[0].fx.get(), 1.0);
 }
 
 #[test]

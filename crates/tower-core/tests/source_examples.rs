@@ -3,7 +3,7 @@ use std::path::Path;
 use serde::Deserialize;
 use tower_core::analysis::{AnalysisResult, TrussSolver};
 use tower_core::design_checks::{CheckEngine, CheckRule, FormulaStatus};
-use tower_core::loads::LoadCaseId;
+use tower_core::loads::{LoadCaseId, SELF_WEIGHT_LOAD_CASE_ID};
 use tower_core::model::TowerModel;
 
 const SIMPLE_BAR_FIXTURE: &str =
@@ -14,12 +14,18 @@ const MATRIX_GATE_FIXTURE: &str =
     include_str!("fixtures/source_examples/example_09_self_weight_nodal_distribution_gate.toml");
 const SOLVER_TARGET: &str = "tower_core_truss_solver";
 const TOTAL_WEIGHT_TARGET: &str = "tower_core_total_weight_check";
+const RUNTIME_LOAD_GENERATOR_TARGET: &str = "runtime_load_generator";
 const TOTAL_WEIGHT_TRACE_ID: &str = "QTY-WEIGHT-001";
 const VALIDATION_EXAMPLES_DOC: &str = include_str!("../../../docs/domain/validation_examples.md");
 const FORMULAS_REGISTER_DOC: &str = include_str!("../../../docs/domain/formulas_register.md");
 const ACCEPTANCE_GATE_DOC: &str = include_str!("../../../docs/domain/acceptance_gate.md");
 const OPEN_QUESTIONS_DOC: &str = include_str!("../../../docs/domain/open_questions.md");
 const LOAD_SW_DIST_TRACE_ID: &str = "LOAD-SW-DIST-001";
+const LOAD_SW_DIST_CIVIL_RAG_SOURCE_IDS: &[&str] = &[
+    "SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS",
+    "SRC-CIVIL-RAG-MATRIX-CH7-WORK-EQUIVALENT-LOADS",
+    "SRC-CIVIL-RAG-MOP74-VERTICAL-AXIS-CONTEXT",
+];
 const MANDATORY_LOAD_SW_LEDGER_FIELDS: &[&str] = &[
     "source rule",
     "clause/project-rule ID",
@@ -45,10 +51,11 @@ struct SourceExample {
     source: Option<SourceTrace>,
     approval: Option<Approval>,
     model: Option<ModelTarget>,
+    sign_convention: Option<String>,
+    runtime_authorization: Option<String>,
     evidence_boundary: Option<String>,
     #[serde(default)]
     expected: Vec<ExpectedOutput>,
-    blocked_reason: Option<String>,
     candidate: Option<CandidateMetadata>,
     #[serde(default)]
     missing_approval_fields: Vec<String>,
@@ -99,8 +106,6 @@ struct CandidateMetadata {
     total_self_weight_kn: f64,
     equal_end_lump_kn: f64,
     boundary: String,
-    #[serde(default)]
-    unapproved_fields: Vec<String>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -181,10 +186,18 @@ fn is_execution_eligible(example: &SourceExample) -> Result<bool, String> {
         return Err("model is required".to_string());
     }
     match example.allowed_target.as_deref() {
-        Some(SOLVER_TARGET | TOTAL_WEIGHT_TARGET) => Ok(true),
+        Some(SOLVER_TARGET | TOTAL_WEIGHT_TARGET | RUNTIME_LOAD_GENERATOR_TARGET) => Ok(()),
         Some(_) => Err("allowed_target is not whitelisted".to_string()),
         None => Err("allowed_target is required".to_string()),
+    }?;
+    if example.allowed_target.as_deref() == Some(RUNTIME_LOAD_GENERATOR_TARGET) {
+        require_present(example.sign_convention.as_deref(), "sign_convention")?;
+        require_present(
+            example.runtime_authorization.as_deref(),
+            "runtime_authorization",
+        )?;
     }
+    Ok(true)
 }
 
 fn validate_quantity_boundary(example: &SourceExample) -> Result<(), String> {
@@ -196,7 +209,10 @@ fn validate_quantity_boundary(example: &SourceExample) -> Result<(), String> {
         return Ok(());
     }
 
-    if example.allowed_target.as_deref() == Some(SOLVER_TARGET) {
+    if matches!(
+        example.allowed_target.as_deref(),
+        Some(SOLVER_TARGET | RUNTIME_LOAD_GENERATOR_TARGET)
+    ) {
         return Ok(());
     }
 
@@ -278,6 +294,18 @@ fn collect_actuals(example: &SourceExample) -> Result<Vec<ActualOutput>, String>
     } else {
         None
     };
+    let generated_self_weight_load_case =
+        if example.allowed_target.as_deref() == Some(RUNTIME_LOAD_GENERATOR_TARGET) {
+            Some(
+                model
+                    .load_cases
+                    .iter()
+                    .find(|load_case| load_case.id.0 == model_target.load_case)
+                    .ok_or_else(|| format!("missing load case {}", model_target.load_case))?,
+            )
+        } else {
+            None
+        };
 
     let mut actuals = Vec::new();
     for expected in &example.expected {
@@ -310,6 +338,21 @@ fn collect_actuals(example: &SourceExample) -> Result<Vec<ActualOutput>, String>
                 .as_ref()
                 .and_then(|result| result.value)
                 .ok_or_else(|| "missing total weight check value".to_string())?,
+            ("nodal_load", "fx_kn" | "fy_kn" | "fz_kn") => {
+                let node_id = required_output_id(expected)?;
+                let load = generated_self_weight_load_case
+                    .ok_or_else(|| "generated load case is required".to_string())?
+                    .nodal_loads
+                    .iter()
+                    .find(|load| load.node_id.0 == node_id)
+                    .ok_or_else(|| format!("missing nodal load for {node_id}"))?;
+                match expected.component.as_str() {
+                    "fx_kn" => load.fx.get(),
+                    "fy_kn" => load.fy.get(),
+                    "fz_kn" => load.fz.get(),
+                    _ => unreachable!(),
+                }
+            }
             _ => {
                 return Err(format!(
                     "unsupported expected output {}.{}",
@@ -370,6 +413,13 @@ fn required_output_id(expected: &ExpectedOutput) -> Result<&str, String> {
         .ok_or_else(|| "expected output requires node_id or member_id".to_string())
 }
 
+fn approved_runtime_self_weight_fixture() -> SourceExample {
+    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
+    validate_metadata(&example).unwrap();
+    assert!(is_execution_eligible(&example).unwrap());
+    example
+}
+
 fn require_present<'a>(value: Option<&'a str>, field: &str) -> Result<&'a str, String> {
     let value = value.ok_or_else(|| format!("{field} is required"))?;
     if value.trim().is_empty() {
@@ -414,10 +464,8 @@ fn metadata_validation_rejects_missing_required_fields() {
 #[test]
 fn non_approved_fixtures_are_metadata_valid_but_not_executable() {
     for status in ["candidate", "blocked", "TODO_DOMAIN_VALIDATION"] {
-        let fixture = MATRIX_GATE_FIXTURE.replace(
-            "status = \"TODO_DOMAIN_VALIDATION\"",
-            &format!("status = \"{status}\""),
-        );
+        let fixture =
+            MATRIX_GATE_FIXTURE.replace("status = \"approved\"", &format!("status = \"{status}\""));
         let example = parse_fixture(&fixture).unwrap();
 
         validate_metadata(&example).unwrap();
@@ -425,7 +473,6 @@ fn non_approved_fixtures_are_metadata_valid_but_not_executable() {
             !is_execution_eligible(&example).unwrap(),
             "{status} must not execute"
         );
-        assert_eq!(example.blocked_reason.as_deref(), Some("Self-weight nodal distribution needs manual PDF/equation/sign review before runtime authorization."));
     }
 }
 
@@ -452,66 +499,178 @@ fn approved_simple_bar_execution_is_stable() {
 }
 
 #[test]
-fn blocked_matrix_fixture_preserves_manual_review_blockers_without_dispatch() {
+fn approved_matrix_fixture_records_runtime_authorization_metadata() {
     let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
 
     validate_metadata(&example).unwrap();
-    assert!(!is_execution_eligible(&example).unwrap());
-    assert!(example.allowed_target.is_none());
-    assert!(example.approval.is_none());
-    assert!(example.model.is_none());
-    assert!(example.expected.is_empty());
+    assert!(is_execution_eligible(&example).unwrap());
+    assert_eq!(
+        example.allowed_target.as_deref(),
+        Some(RUNTIME_LOAD_GENERATOR_TARGET)
+    );
+    assert_eq!(
+        example.sign_convention.as_deref(),
+        Some("z-up; self-weight acts in negative fz")
+    );
     assert!(example
-        .missing_approval_fields
-        .iter()
-        .any(|field| field == "signs/directions"));
-    assert!(example
-        .blocked_reason
+        .runtime_authorization
         .as_deref()
         .unwrap()
-        .contains("manual PDF/equation/sign review"));
+        .contains("straight two-node axial member"));
+    assert!(example.approval.is_some());
+    assert!(example.model.is_some());
+    assert_eq!(example.expected.len(), 6);
 }
 
 #[test]
-fn blocked_matrix_fixture_records_candidate_arithmetic_without_runtime_approval() {
-    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
-    let candidate = example
-        .candidate
-        .as_ref()
-        .expect("example_09 must record candidate-only arithmetic metadata");
+fn approved_self_weight_fixture_executes_runtime_generated_equal_end_loads() {
+    let example = approved_runtime_self_weight_fixture();
 
-    assert_eq!(example.status.as_deref(), Some("TODO_DOMAIN_VALIDATION"));
-    assert_eq!(candidate.status, "candidate_only_unapproved");
-    assert_eq!(candidate.total_self_weight_kn, 0.153_964_405);
-    assert_eq!(candidate.equal_end_lump_kn, 0.076_982_202_5);
-    assert!(candidate.boundary.contains("candidate only"));
-    assert!(candidate.boundary.contains("not approved"));
-    assert!(candidate.boundary.contains("runtime authorization"));
-    for field in [
-        "axis/sign",
-        "target nodes",
-        "distribution factors",
-        "tolerance rationale",
-        "reviewer/date",
-        "runtime authorization",
-    ] {
+    let actuals = collect_actuals(&example).unwrap();
+
+    assert_eq!(
+        actuals,
+        vec![
+            ActualOutput {
+                label: "nodal_load:fixed:fx_kn".to_string(),
+                value: 0.0,
+            },
+            ActualOutput {
+                label: "nodal_load:fixed:fy_kn".to_string(),
+                value: 0.0,
+            },
+            ActualOutput {
+                label: "nodal_load:fixed:fz_kn".to_string(),
+                value: -0.076_982_202_5,
+            },
+            ActualOutput {
+                label: "nodal_load:free:fx_kn".to_string(),
+                value: 0.0,
+            },
+            ActualOutput {
+                label: "nodal_load:free:fy_kn".to_string(),
+                value: 0.0,
+            },
+            ActualOutput {
+                label: "nodal_load:free:fz_kn".to_string(),
+                value: -0.076_982_202_5,
+            },
+        ]
+    );
+    execute_fixture(&example).unwrap();
+}
+
+#[test]
+fn self_weight_runtime_approval_requires_complete_metadata_and_expected_values() {
+    let cases = [
+        (
+            MATRIX_GATE_FIXTURE.replace("reviewer = \"Jonnathan\"\n", ""),
+            "approval.reviewer",
+        ),
+        (
+            MATRIX_GATE_FIXTURE.replace("date = \"2026-07-10\"\n", ""),
+            "approval.date",
+        ),
+        (
+            MATRIX_GATE_FIXTURE.replace("sign_convention = \"z-up; self-weight acts in negative fz\"\n", ""),
+            "sign_convention",
+        ),
+        (
+            MATRIX_GATE_FIXTURE.replace("runtime_authorization = \"approved narrow runtime rule: straight two-node axial member with uniform self-weight only\"\n", ""),
+            "runtime_authorization",
+        ),
+        (
+            MATRIX_GATE_FIXTURE.replace("[[expected]]", "[[missing_expected]]"),
+            "expected",
+        ),
+    ];
+
+    for (fixture, expected_error) in cases {
+        let example = parse_fixture(&fixture).unwrap();
+        let error = is_execution_eligible(&example).unwrap_err();
         assert!(
-            candidate
-                .unapproved_fields
-                .iter()
-                .any(|unapproved| unapproved == field),
-            "candidate metadata must keep {field} unapproved"
+            error.contains(expected_error),
+            "expected {expected_error}, got {error}"
         );
     }
 }
 
 #[test]
-fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
+fn source_harness_does_not_infer_missing_self_weight_expected_values() {
+    let fixture_without_fixed_fz = MATRIX_GATE_FIXTURE.replace(
+        "[[expected]]\nkind = \"nodal_load\"\nnode_id = \"fixed\"\ncomponent = \"fz_kn\"\nvalue = -0.0769822025\nunit = \"kN\"\ntolerance = { absolute = 1e-10, relative = 1e-7, rationale = \"LOAD-SW-DIST-001 equal-end self-weight nodal load tolerance\" }\n\n",
+        "",
+    );
+    let example = parse_fixture(&fixture_without_fixed_fz).unwrap();
+
+    let actuals = collect_actuals(&example).unwrap();
+
+    assert!(!actuals
+        .iter()
+        .any(|actual| actual.label == "nodal_load:fixed:fz_kn"));
+}
+
+#[test]
+fn explicit_generated_self_weight_load_case_id_is_rejected() {
+    let fixture_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/source_examples");
+    let model_path = fixture_dir.join("example_05_member_weight_quantity_model.toml");
+    let model_text = std::fs::read_to_string(&model_path).unwrap();
+    let model_text = model_text.replace(
+        "[[load_cases]]\nid = \"axial\"",
+        &format!("[[load_cases]]\nid = \"{SELF_WEIGHT_LOAD_CASE_ID}\""),
+    );
+
+    let error = TowerModel::from_toml_str(&model_text).unwrap_err();
+
+    assert!(error
+        .to_string()
+        .contains("duplicate id `generated-self-weight`"));
+}
+
+#[test]
+fn unsupported_empty_member_scope_generates_no_self_weight_load_case() {
+    let fixture_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/source_examples");
+    let model_path = fixture_dir.join("example_05_member_weight_quantity_model.toml");
+    let model_text = std::fs::read_to_string(&model_path).unwrap();
+    let unsupported_model = model_text.replace(
+        "[[members]]\nid = \"bar-x\"\nstart = \"fixed\"\nend = \"free\"\nsection_id = \"bar\"\n\n",
+        "",
+    );
+
+    let model = TowerModel::from_toml_str(&unsupported_model).unwrap();
+
+    assert!(!model
+        .load_cases
+        .iter()
+        .any(|load_case| load_case.id.0 == SELF_WEIGHT_LOAD_CASE_ID));
+}
+
+#[test]
+fn approved_matrix_fixture_records_narrow_runtime_arithmetic() {
+    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
+    let candidate = example
+        .candidate
+        .as_ref()
+        .expect("example_09 must record approved narrow arithmetic metadata");
+
+    assert_eq!(example.status.as_deref(), Some("approved"));
+    assert_eq!(candidate.status, "approved_narrow_runtime_rule");
+    assert_eq!(candidate.total_self_weight_kn, 0.153_964_405);
+    assert_eq!(candidate.equal_end_lump_kn, 0.076_982_202_5);
+    assert!(candidate.boundary.contains("approved narrow runtime rule"));
+    assert!(candidate
+        .boundary
+        .contains("straight two-node axial member"));
+    assert!(candidate.boundary.contains("no nonuniform"));
+}
+
+#[test]
+fn docs_record_approved_narrow_runtime_rule_and_exclusions() {
     for required in [
         "total self-weight `0.153964405 kN`",
-        "equal-end candidate value `0.0769822025 kN`",
-        "review-only arithmetic",
-        "axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization remain unapproved",
+        "equal-end runtime value `-0.0769822025 kN`",
+        "approved narrow runtime rule",
+        "straight two-node axial member with uniform self-weight only",
     ] {
         assert!(
             VALIDATION_EXAMPLES_DOC.contains(required),
@@ -520,9 +679,9 @@ fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
     }
 
     for required in [
-        "candidate review values: total `0.153964405 kN`; equal-end lumping candidate `0.0769822025 kN` per end",
-        "not an approved formula, nodal distribution rule, load-generation rule, or runtime authorization",
-        "axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, and runtime authorization",
+        "approved runtime values: total `0.153964405 kN`; endpoint `fz = -0.0769822025 kN` at `fixed` and `free`",
+        "W = density * area * length * g / 1000",
+        "nonuniform members, beam fixed-end actions, eccentric loads, wind/conductor loads, and load combinations remain excluded",
     ] {
         assert!(
             FORMULAS_REGISTER_DOC.contains(required),
@@ -531,9 +690,9 @@ fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
     }
 
     for required in [
-        "candidate arithmetic does not authorize schema, CLI, runtime, reports, optimizer, examples, or executable tests",
-        "total `0.153964405 kN` and equal-end candidate `0.0769822025 kN` per end",
-        "no target-node, axis/sign, tolerance, reviewer/date, or runtime authorization may be inferred",
+        "runtime generation is approved only for `LOAD-SW-DIST-001` straight two-node uniform axial self-weight",
+        "endpoint `fz = -0.0769822025 kN` at `fixed` and `free`",
+        "no runtime `civil-rag` lookup or source interpretation is permitted",
     ] {
         assert!(
             ACCEPTANCE_GATE_DOC.contains(required),
@@ -543,7 +702,49 @@ fn docs_record_candidate_arithmetic_and_preserve_runtime_blockers() {
 }
 
 #[test]
-fn docs_define_complete_load_sw_dist_non_runtime_approval_packet_ledger() {
+fn docs_and_fixture_expose_civil_rag_candidate_evidence_without_approval() {
+    let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
+
+    assert_eq!(
+        example.candidate_sources,
+        LOAD_SW_DIST_CIVIL_RAG_SOURCE_IDS
+            .iter()
+            .map(|source_id| source_id.to_string())
+            .collect::<Vec<_>>()
+    );
+    assert!(example
+        .candidate_sources
+        .iter()
+        .all(|source_id| source_id.starts_with("SRC-CIVIL-RAG-")));
+
+    for source_id in LOAD_SW_DIST_CIVIL_RAG_SOURCE_IDS {
+        for (doc_name, doc) in [
+            ("formulas_register.md", FORMULAS_REGISTER_DOC),
+            ("validation_examples.md", VALIDATION_EXAMPLES_DOC),
+            ("acceptance_gate.md", ACCEPTANCE_GATE_DOC),
+        ] {
+            assert!(
+                doc.contains(source_id),
+                "{doc_name} must expose civil-rag candidate source {source_id}"
+            );
+        }
+    }
+
+    for required_phrase in [
+        "retrieval basis",
+        "candidate relation",
+        "candidate evidence only",
+        "cannot authorize runtime generated loads",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(required_phrase),
+            "validation_examples.md must document {required_phrase} for civil-rag evidence"
+        );
+    }
+}
+
+#[test]
+fn docs_define_complete_load_sw_dist_runtime_approval_packet_ledger() {
     assert_doc_contains_all_fields("formulas_register.md", FORMULAS_REGISTER_DOC);
     assert_doc_contains_all_fields("validation_examples.md", VALIDATION_EXAMPLES_DOC);
     assert_doc_contains_all_fields("acceptance_gate.md", ACCEPTANCE_GATE_DOC);
@@ -556,73 +757,66 @@ fn docs_define_complete_load_sw_dist_non_runtime_approval_packet_ledger() {
         OPEN_QUESTIONS_DOC,
     ] {
         let doc_lower = doc.to_ascii_lowercase();
-        assert!(doc_lower
-            .contains("candidate inventory/arithmetic is not approved engineering evidence"));
-        assert!(doc_lower.contains("does not authorize runtime execution"));
+        assert!(doc_lower.contains("approved narrow runtime rule"));
+        assert!(doc_lower.contains("straight two-node axial member"));
     }
 }
 
 #[test]
-fn self_weight_packet_missing_reviewer_interpretation_remains_candidate_only() {
-    let fixture = MATRIX_GATE_FIXTURE.replace("    \"reviewer interpretation\",\n", "");
+fn self_weight_packet_missing_sign_convention_remains_non_executable() {
+    let fixture = MATRIX_GATE_FIXTURE.replace(
+        "sign_convention = \"z-up; self-weight acts in negative fz\"\n",
+        "",
+    );
     let example = parse_fixture(&fixture).unwrap();
 
     validate_metadata(&example).unwrap();
-    assert!(!is_execution_eligible(&example).unwrap());
-    assert!(!example
-        .missing_approval_fields
-        .iter()
-        .any(|field| field == "reviewer interpretation"));
+    assert!(is_execution_eligible(&example)
+        .unwrap_err()
+        .contains("sign_convention"));
     assert!(example.candidate.is_some());
     assert!(collect_actuals(&example)
         .unwrap_err()
-        .contains("not executable"));
+        .contains("sign_convention"));
 }
 
 #[test]
-fn reviewer_identity_and_date_without_future_authorization_stay_non_executable() {
-    let fixture = format!(
-        "{}\n[approval]\nreviewer = \"Domain Reviewer\"\ndate = \"2026-06-30\"\n",
-        MATRIX_GATE_FIXTURE.replace(
-            "status = \"TODO_DOMAIN_VALIDATION\"",
-            "status = \"approved\"\nallowed_target = \"tower_core_truss_solver\"",
-        )
+fn reviewer_identity_and_date_without_runtime_authorization_stay_non_executable() {
+    let fixture = MATRIX_GATE_FIXTURE.replace(
+        "runtime_authorization = \"approved narrow runtime rule: straight two-node axial member with uniform self-weight only\"\n",
+        "",
     );
     let example = parse_fixture(&fixture).unwrap();
 
     let error = is_execution_eligible(&example).unwrap_err();
 
-    assert!(error.contains("runtime authorization"), "got {error}");
-    assert!(example.expected.is_empty());
-    assert!(example.model.is_none());
+    assert!(error.contains("runtime_authorization"), "got {error}");
+    assert_eq!(example.expected.len(), 6);
+    assert!(example.model.is_some());
 }
 
 #[test]
-fn matrix_gate_fixture_records_every_approval_blocker_and_no_executable_fields() {
+fn matrix_gate_fixture_records_every_runtime_approval_field() {
     let example = parse_fixture(MATRIX_GATE_FIXTURE).unwrap();
 
-    assert_eq!(example.status.as_deref(), Some("TODO_DOMAIN_VALIDATION"));
+    assert_eq!(example.status.as_deref(), Some("approved"));
     assert!(example.trace_ids.as_ref().is_some_and(|trace_ids| trace_ids
         .iter()
         .any(|trace_id| trace_id == LOAD_SW_DIST_TRACE_ID)));
-    assert!(example.allowed_target.is_none());
-    assert!(example.approval.is_none());
-    assert!(example.model.is_none());
-    assert!(example.expected.is_empty());
     assert_eq!(
-        example.missing_approval_fields,
-        MANDATORY_LOAD_SW_LEDGER_FIELDS
-            .iter()
-            .map(|field| field.to_string())
-            .collect::<Vec<_>>()
+        example.allowed_target.as_deref(),
+        Some(RUNTIME_LOAD_GENERATOR_TARGET)
     );
+    assert!(example.approval.is_some());
+    assert!(example.model.is_some());
+    assert_eq!(example.expected.len(), 6);
+    assert!(example.missing_approval_fields.is_empty());
     assert_eq!(
         example.candidate_sources,
-        vec![
-            "SRC-MATRIX-CH5-LOADS-BETWEEN-NODES".to_string(),
-            "SRC-MATRIX-CH5-FIXED-END-EQUIVALENT-LOADS".to_string(),
-            "SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS".to_string(),
-        ]
+        LOAD_SW_DIST_CIVIL_RAG_SOURCE_IDS
+            .iter()
+            .map(|source_id| source_id.to_string())
+            .collect::<Vec<_>>()
     );
 }
 
@@ -632,7 +826,7 @@ fn incomplete_approved_fixtures_fail_before_numeric_comparison() {
     let no_expected = SIMPLE_BAR_FIXTURE.replace("[[expected]]", "[[missing_expected]]");
     let unknown_target = SIMPLE_BAR_FIXTURE.replace(
         "allowed_target = \"tower_core_truss_solver\"",
-        "allowed_target = \"runtime_load_generator\"",
+        "allowed_target = \"unknown_target\"",
     );
 
     for (fixture, expected_error) in [

@@ -7,6 +7,7 @@ use crate::geometry::{MemberId, NodeId, Point3, RawPoint3};
 use crate::loads::{LoadCase, LoadCaseId, RawLoadCase};
 use crate::materials::{Material, MaterialId, RawMaterial};
 use crate::sections::{RawSection, Section, SectionId};
+use crate::self_weight::generated_self_weight_load_case_for_model;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Node {
@@ -131,7 +132,7 @@ impl RawTowerModel {
             &load_cases,
         )?;
 
-        Ok(TowerModel {
+        let mut model = TowerModel {
             metadata: self.metadata,
             nodes,
             members,
@@ -139,7 +140,28 @@ impl RawTowerModel {
             materials,
             sections,
             load_cases,
-        })
+        };
+
+        if let Some(generated_load_case) = generated_self_weight_load_case_for_model(&model)? {
+            model.load_cases.push(generated_load_case);
+            ensure_unique(
+                model
+                    .load_cases
+                    .iter()
+                    .map(|load_case| load_case.id.0.as_str()),
+                "load_cases",
+            )?;
+            validate_references(
+                &model.nodes,
+                &model.materials,
+                &model.sections,
+                &model.members,
+                &model.supports,
+                &model.load_cases,
+            )?;
+        }
+
+        Ok(model)
     }
 }
 

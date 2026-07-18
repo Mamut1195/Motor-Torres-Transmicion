@@ -16,6 +16,7 @@ All proposed numeric fixtures use SI-derived project units: length in `m`, force
 | `example_06_tension_axial_stress_utilization` | Validate preliminary tension axial stress utilization trace. | `stress_mpa = abs(P_kN) / A_m2 / 1000` and `utilization = stress_mpa / Fy_MPa` map to `CHK-TENSION-001`. | Covered by validated-member-checks-v1 Strict TDD tests. |
 | `example_07_compression_axial_stress_utilization` | Validate preliminary compression axial stress utilization trace without buckling claims. | `stress_mpa = abs(P_kN) / A_m2 / 1000` and `utilization = stress_mpa / Fy_MPa` map to `CHK-COMPRESSION-001`. | Covered by validated-member-checks-v1 Strict TDD tests. |
 | `example_08_slenderness_effective_length_gate` | Define the required accepted-example shape before any `CHK-SLENDERNESS-001` implementation. | Must state length basis, `K` if applicable, axis-specific radii, units, member category, compression applicability, semantic choice (`L/r`, `K·L/r`, or blocked-only), expected output, trace ID, source clause, and reviewer/date. It must not contain pass/fail compliance unless the docs gate approves the source-backed limit. | Required but not approved; `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION`. |
+| `example_09_self_weight_nodal_distribution_gate` | Validate approved narrow runtime self-weight nodal generation. | Straight two-node axial member with uniform self-weight generates endpoint loads only: `fx = 0`, `fy = 0`, `fz = -W/2`. | Approved narrow runtime rule for `LOAD-SW-DIST-001`; all other load generation remains excluded. |
 
 ## Proposed reference fixture: `example_01_simple_bar`
 
@@ -187,13 +188,23 @@ The following shape defines the evidence that a future reviewer must supply. It 
 
 `example_08_slenderness_effective_length_gate` is a non-accepted placeholder. It must not be converted into a Rust test, runtime fixture, report output, optimizer constraint, or implementation formula until reviewer-approved clauses, inputs, limits if any, expected values, reviewer identity, and ISO date are recorded.
 
+## Approved runtime rule: `example_09_self_weight_nodal_distribution_gate`
+
+Status: approved narrow runtime rule for `LOAD-SW-DIST-001` only.
+
+This rule converts the already validated `QTY-WEIGHT-001` arithmetic into deterministic generated nodal loads for a straight two-node axial member with uniform self-weight only. Runtime generation uses `W = density * area * length * g / 1000`; for the approved fixture, total self-weight `0.153964405 kN` produces equal-end runtime value `-0.0769822025 kN` on `fz` at target nodes `fixed` and `free`, with `fx = 0` and `fy = 0`.
+
+Mandatory ledger fields for `LOAD-SW-DIST-001` are complete for this narrow packet: source rule, clause/project-rule ID, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability limits, numeric trace, tolerance rationale, reviewer identity, ISO review date, and future tests-first runtime authorization status. The sign convention is z-up, so gravity/self-weight acts in negative `fz`. The approved runtime authorization is limited to the source-example fixture and the matching engine-owned generated load case.
+
+Explicit exclusions: nonuniform members, beam fixed-end actions, eccentric loads, wind/conductor loads, load combinations, load factors, controlling-case execution, and final engineering design claims remain blocked. No runtime `civil-rag` lookup or source interpretation is permitted; captured civil-rag rows remain candidate evidence only.
+
 ## Load Model v2 accepted-example packet templates
 
 Status: required but not approved. These templates are non-executable review packets. They must not be converted into tests, examples, runtime behavior, reports, optimizer constraints, or controlling-case execution until every approval field is complete.
 
 | Example ID | Topic | Required inputs and units | Expected calculation shape | Tolerance / rationale | Current state |
 |---|---|---|---|---|---|
-| `example_09_self_weight_nodal_distribution_gate` | Self-weight nodal distribution | Member ID, end nodes, member length, area, density, gravity, source/project rule, coordinate/sign convention, distribution/lumping assumption, target nodes, output force units. | Compute `QTY-WEIGHT-001`, then apply the approved distribution rule to target nodes and force directions only after the rule is approved. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; source/project rule, exact clause or rule ID, interpretation, distribution assumption, target nodes, directions/signs, numeric example, tolerance, reviewer, ISO date, and runtime authorization missing. |
+| `example_09_self_weight_nodal_distribution_gate` | Self-weight nodal distribution | Member ID, end nodes, member length, area, density, gravity, source/project rule, coordinate/sign convention, distribution/lumping assumption, target nodes, output force units. | Compute `QTY-WEIGHT-001`, then apply the approved equal-end distribution rule to target nodes and negative `fz`. | Absolute `1e-10`, relative `1e-7`; approved for this fixture only. | Approved narrow runtime rule; straight two-node axial member with uniform self-weight only. |
 | `example_10_wind_load_gate` | Wind loading | Approved source inputs such as geometry, exposure/pressure assumptions, direction, tributary area or equivalent mapping, units, and applicability limits. | Apply the approved wind source interpretation and map resulting loads to the model representation. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact clauses, interpretation, reviewer, and ISO date missing. |
 | `example_11_conductor_load_gate` | Conductor loads | Approved conductor/span inputs, attachment nodes, load direction/sign convention, units, and transfer assumptions. | Apply the approved conductor load rule and map forces to tower attachment nodes. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; exact assumptions, source, reviewer, and ISO date missing. |
 | `example_12_load_combination_factor_gate` | Load combinations / factors | Approved load case IDs, participating load categories, factors, units, sign convention, and source/project rule. | Combine approved component loads using approved factors and show intermediate and final combined vectors. | Required if converted to a future software comparison; not approved. | `TODO_DOMAIN_VALIDATION`; combinations, factors, reviewer, and ISO date missing. |
@@ -254,6 +265,18 @@ Matrix Structural Analysis is relevant source inventory for a future accepted ex
 | `SRC-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Ch. 7 §7.5, Eq. 7.32; exploration pointer: book pp. 194-196 / PDF pp. 215-217 | Review effective/work-equivalent nodal load derivation and the explored uniformly loaded axial member apportionment note. | Reviewer must manually verify the equation/signs and decide whether it applies to gravity self-weight in the project coordinate convention. |
 
 No numeric nodal-load values are approved for `example_09_self_weight_nodal_distribution_gate`. The candidate total and equal-end arithmetic above does not infer axis/sign, target nodes, distribution factors, tolerance rationale, reviewer/date, or runtime authorization. A future accepted example must still provide reviewer-approved inputs, substitutions, intermediate values, expected nodal forces, tolerance/rationale, trace ID, reviewer identity, ISO date, and runtime authorization through a future tests-first SDD.
+
+### Captured civil-rag evidence ledger for `example_09_self_weight_nodal_distribution_gate`
+
+This ledger records candidate evidence only. It is reviewer-facing source traceability, not approval, not an accepted numeric example, and it cannot authorize runtime generated loads.
+
+| Candidate source ID | Excerpt / summary | Retrieval basis | Candidate relation | Approval blocker |
+|---|---|---|---|---|
+| `SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS` | Tower self-weight references indicate member dead/self weight may be considered for structural joint or tributary-point review. | Captured `civil-rag` query for self-weight, tower, nodal distribution, tributary joints, and member dead load. | Provides candidate relation between `QTY-WEIGHT-001` quantity evidence and a future reviewer-owned nodal distribution packet. | Reviewer must still approve source rule, interpretation, assumptions, target nodes, signs/directions, units, applicability, numeric trace, tolerance, reviewer identity, ISO date, and runtime authorization. |
+| `SRC-CIVIL-RAG-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Matrix Structural Analysis Ch. 7 work-equivalent/effective nodal load material may support a future manually reviewed distribution derivation. | Captured `civil-rag` query for work-equivalent loads, axial member distributed load, and Matrix Structural Analysis Ch. 7 Eq. 7.32 context. | Candidate relation to possible equivalent nodal load reasoning for member self-weight distribution. | Reviewer must manually verify equation text, signs, applicability to axial truss members, and all approval fields before any runtime SDD. |
+| `SRC-CIVIL-RAG-MOP74-VERTICAL-AXIS-CONTEXT` | MOP 74 vertical-axis/sign material may provide context for documenting gravity direction and coordinate convention. | Captured `civil-rag` query for transmission tower vertical axis, gravity, sign convention, and load direction context. | Candidate relation to sign/direction review only. | It cannot infer force components, signs, target nodes, or generated loads. |
+
+The retrieval basis and candidate relation fields are intentionally non-executable. They preserve traceability for human review while keeping `TODO_DOMAIN_VALIDATION`, missing approval blockers, and the no-runtime boundary intact.
 
 ## Failed-run examples
 

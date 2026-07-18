@@ -3,6 +3,7 @@ use crate::errors::{Result, TowerError};
 use crate::materials::MaterialId;
 use crate::model::{Member, Node, TowerModel};
 use crate::sections::Section;
+use crate::self_weight::member_self_weight_kn;
 
 pub fn design_checks_not_available() -> Result<()> {
     Err(TowerError::BlockedDomainFeature {
@@ -10,7 +11,6 @@ pub fn design_checks_not_available() -> Result<()> {
     })
 }
 
-const STANDARD_GRAVITY_M_PER_S2: f64 = 9.806_65;
 const VALIDATED_TOTAL_WEIGHT_TRACE_ID: &str = "QTY-WEIGHT-001";
 const VALIDATED_TENSION_TRACE_ID: &str = "CHK-TENSION-001";
 const VALIDATED_COMPRESSION_TRACE_ID: &str = "CHK-COMPRESSION-001";
@@ -173,8 +173,7 @@ fn total_weight_check(
         let section = section_for_member(model, member)?;
         let density = density_for_section(model, &section.material_id)?;
         let length_m = member_length(model, member)?;
-        total_weight_kn +=
-            density * section.nominal_area_m2 * length_m * STANDARD_GRAVITY_M_PER_S2 / 1_000.0;
+        total_weight_kn += member_self_weight_kn(density, section.nominal_area_m2, length_m);
         inputs.push(format!("{}.length_m", member.id.0));
         inputs.push(format!("{}.nominal_area_m2", section.id.0));
         inputs.push(format!("{}.density_kg_per_m3", section.material_id.0));

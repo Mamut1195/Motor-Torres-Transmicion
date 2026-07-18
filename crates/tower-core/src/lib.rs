@@ -17,6 +17,7 @@ pub mod model;
 pub mod optimization;
 pub mod reporting;
 pub mod sections;
+pub mod self_weight;
 pub mod units;
 
 pub use errors::{Result, TowerError};

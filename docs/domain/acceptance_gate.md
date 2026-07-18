@@ -84,13 +84,15 @@ This reporting and documentation boundary is not for final engineering design.
 |---|---|---|
 | Explicit user-provided nodal load cases | `explicit_user_input` | Accepted only as traceable user input with visible source/status. Force values are preserved; no normative loading claim is made. |
 | `QTY-WEIGHT-001` member self-weight quantity | `validated_quantity` | Accepted only as non-normative quantity evidence. It must not generate nodal loads without approved lumping/modeling assumptions. |
-| Self-weight nodal load generation | `TODO_DOMAIN_VALIDATION` | Blocked. |
+| Self-weight nodal load generation | `validated_quantity` / approved narrow runtime rule | runtime generation is approved only for `LOAD-SW-DIST-001` straight two-node uniform axial self-weight. endpoint `fz = -0.0769822025 kN` at `fixed` and `free` is validated for the source example; no runtime `civil-rag` lookup or source interpretation is permitted. |
 | Wind loads | `TODO_DOMAIN_VALIDATION` | Blocked. |
 | Conductor loads | `TODO_DOMAIN_VALIDATION` | Blocked. |
 | Load combinations and load factors | `TODO_DOMAIN_VALIDATION` | Blocked. |
 | Displacement or design-level loading | `TODO_DOMAIN_VALIDATION` | Blocked. |
 
 Acceptance rule: reports may expose status/source evidence and blocked categories only. They must not emit code-compliant loading behavior, load combinations/factors, generated self-weight nodal loads, wind/conductor loading, or final engineering design claims.
+
+Approved narrow runtime rule: generated self-weight may be created only by the engine-owned `LOAD-SW-DIST-001` path for a straight two-node axial member with uniform self-weight using `W = density * area * length * g / 1000` and endpoint `fz = -W/2`. Nonuniform members, beam fixed-end actions, eccentric loads, wind/conductor loads, load combinations, load factors, controlling cases, and final engineering design claims remain blocked.
 
 ## Load Model v2 source evidence gate
 
@@ -170,6 +172,18 @@ Matrix Structural Analysis, Second Edition has been recorded as candidate/suppor
 | Ch. 13 dead-load mention | Non-supporting context unless a future reviewer explicitly documents otherwise. |
 
 Acceptance rule: Matrix evidence alone cannot approve generated nodal loads. Approval still requires reviewer identity, ISO date, interpretation, assumptions, signs, target nodes, applicability limits, reviewed numeric example, tolerance/rationale, and explicit future tests-first runtime authorization.
+
+### Captured civil-rag candidate evidence guard
+
+Captured `civil-rag` excerpts for `LOAD-SW-DIST-001` are reviewer evidence only. They are candidate evidence only and cannot authorize runtime generated loads, schema fields, CLI behavior, solver behavior, reports, optimizer constraints, examples, executable tests, target-node inference, force-component mapping, or approval metadata.
+
+| Candidate source ID | Gate meaning | Runtime decision |
+|---|---|---|
+| `SRC-CIVIL-RAG-TOWER-SELF-WEIGHT-TRIBUTARY-JOINTS` | Candidate context for self-weight and tributary/joint review. | No runtime authorization; target nodes and allocation remain missing. |
+| `SRC-CIVIL-RAG-MATRIX-CH7-WORK-EQUIVALENT-LOADS` | Candidate work-equivalent load context requiring manual equation/sign/applicability review. | No runtime authorization; distribution factors, signs, and applicability remain missing. |
+| `SRC-CIVIL-RAG-MOP74-VERTICAL-AXIS-CONTEXT` | Candidate vertical-axis/sign context only. | No runtime authorization; force component mapping remains missing. |
+
+Acceptance remains blocked until the complete reviewer-owned packet is recorded with source rule, reviewer interpretation, assumptions, target nodes, signs/directions, units, applicability, numeric trace, tolerance rationale, reviewer identity, ISO review date, and explicit future tests-first runtime authorization.
 
 ## `CHK-SLENDERNESS-001` research gate
 
