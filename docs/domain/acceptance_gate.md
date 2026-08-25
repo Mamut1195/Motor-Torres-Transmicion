@@ -215,6 +215,16 @@ This docs-only evidence package does not approve or implement slenderness behavi
 
 Acceptance rule for this check: no acceptance checkbox or status may close unless reviewer identity and ISO date evidence are present for the full source-backed packet. Until then, `CHK-SLENDERNESS-001` may be mentioned only as an unresolved validation gap and must not support compliance, pass/fail, feasibility, buckling, column-strength, or final-design claims.
 
+### `CHK-SLENDERNESS-001` geometric `L/r` runtime authorization packet
+
+This packet is non-runtime and can only authorize a later tests-first quantity-only slice if it is completed and explicitly approved. Required packet fields are decision; semantic choice; applicability; scalar radius policy; units; numeric example; tolerance; reviewer identity; ISO date; and future tests-first runtime authorization status.
+
+Decision rule: decision: `approved | rejected | deferred`; current decision: `deferred`. Because the packet is missing reviewer identity, ISO date, numeric example, and tolerance, no runtime `L/r` computation is authorized.
+
+Approved future scope, if later completed, is limited to semantic choice `geometric_scalar_L_over_r_quantity_only` and formula `L/r = two-node member length / existing scalar section.radius_of_gyration`, with `L in m, scalar r in m, output dimensionless`. The scalar radius policy must explicitly address whether scalar `section.radius_of_gyration` is acceptable as `r` despite unresolved governing-axis implications.
+
+Forbidden scope: this gate does not authorize runtime `L/r`, does not authorize schema expansion, does not authorize pass/fail, does not authorize ASCE limits, does not authorize effective `K·L/r`, does not authorize Euler or column capacity, does not authorize optimizer feasibility, does not authorize runtime `civil-rag`, and does not authorize final-design claims.
+
 ## Pre-WU3 gate
 
 WU3 may start only after the reviewer accepts the following documentation set:

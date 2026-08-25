@@ -78,6 +78,18 @@ const SLENDERNESS_LEDGER_REQUIRED_FIELDS: &[&str] = &[
     "source type",
     "approval boundary",
 ];
+const SLENDERNESS_LR_RUNTIME_AUTH_PACKET_FIELDS: &[&str] = &[
+    "decision",
+    "semantic choice",
+    "applicability",
+    "scalar radius policy",
+    "units",
+    "numeric example",
+    "tolerance",
+    "reviewer identity",
+    "ISO date",
+    "future tests-first runtime authorization status",
+];
 
 #[derive(Debug, Deserialize)]
 struct SourceExample {
@@ -886,6 +898,80 @@ fn slenderness_docs_record_civil_rag_source_evidence_ledger_without_runtime_appr
                 || ACCEPTANCE_GATE_DOC.contains(required_boundary)
                 || OPEN_QUESTIONS_DOC.contains(required_boundary),
             "domain docs must preserve slenderness boundary wording: {required_boundary}"
+        );
+    }
+}
+
+#[test]
+fn slenderness_docs_define_geometric_lr_runtime_authorization_packet_fields() {
+    for (doc_name, doc) in [
+        ("validation_examples.md", VALIDATION_EXAMPLES_DOC),
+        ("formulas_register.md", FORMULAS_REGISTER_DOC),
+        ("acceptance_gate.md", ACCEPTANCE_GATE_DOC),
+        ("open_questions.md", OPEN_QUESTIONS_DOC),
+    ] {
+        for field in SLENDERNESS_LR_RUNTIME_AUTH_PACKET_FIELDS {
+            assert!(
+                doc.contains(field),
+                "{doc_name} must document CHK-SLENDERNESS-001 geometric L/r runtime authorization packet field {field}"
+            );
+        }
+    }
+
+    for required in [
+        "geometric_scalar_L_over_r_quantity_only",
+        "two-node member length / existing scalar section.radius_of_gyration",
+        "L/r = two-node member length / existing scalar section.radius_of_gyration",
+        "L in m, scalar r in m, output dimensionless",
+        "current decision: `deferred`",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(required)
+                || FORMULAS_REGISTER_DOC.contains(required)
+                || ACCEPTANCE_GATE_DOC.contains(required)
+                || OPEN_QUESTIONS_DOC.contains(required),
+            "domain docs must record geometric L/r runtime authorization detail: {required}"
+        );
+    }
+}
+
+#[test]
+fn slenderness_docs_record_deferred_tri_state_runtime_authorization() {
+    for required in [
+        "decision: `approved | rejected | deferred`",
+        "current decision: `deferred`",
+        "no runtime `L/r` computation is authorized",
+        "missing reviewer identity, ISO date, numeric example, and tolerance",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(required)
+                || FORMULAS_REGISTER_DOC.contains(required)
+                || ACCEPTANCE_GATE_DOC.contains(required)
+                || OPEN_QUESTIONS_DOC.contains(required),
+            "domain docs must preserve deferred tri-state runtime authorization wording: {required}"
+        );
+    }
+}
+
+#[test]
+fn slenderness_geometric_lr_packet_preserves_forbidden_scope_boundaries() {
+    for forbidden_scope_boundary in [
+        "does not authorize runtime `L/r`",
+        "does not authorize schema expansion",
+        "does not authorize pass/fail",
+        "does not authorize ASCE limits",
+        "does not authorize effective `K·L/r`",
+        "does not authorize Euler or column capacity",
+        "does not authorize optimizer feasibility",
+        "does not authorize runtime `civil-rag`",
+        "does not authorize final-design claims",
+    ] {
+        assert!(
+            VALIDATION_EXAMPLES_DOC.contains(forbidden_scope_boundary)
+                || FORMULAS_REGISTER_DOC.contains(forbidden_scope_boundary)
+                || ACCEPTANCE_GATE_DOC.contains(forbidden_scope_boundary)
+                || OPEN_QUESTIONS_DOC.contains(forbidden_scope_boundary),
+            "domain docs must preserve forbidden scope boundary: {forbidden_scope_boundary}"
         );
     }
 }

@@ -212,6 +212,28 @@ This ledger records restored `civil-rag` retrieval evidence for ASCE 10-15. It i
 
 Approval boundary: a future reviewer-owned packet must still provide semantic choice, exact source title/edition/clause/page or source ID, inputs with units, applicability, limits if any, numeric example if available, tolerance rationale, reviewer identity, ISO approval date, and future tests-first runtime authorization status. Until then, `CHK-SLENDERNESS-001` remains `TODO_DOMAIN_VALIDATION` and blocked-only.
 
+### `CHK-SLENDERNESS-001` geometric `L/r` runtime authorization packet
+
+This docs-only packet records whether a later tests-first runtime slice may compute a traceable geometric scalar quantity only. It does not approve or implement runtime behavior.
+
+Required packet fields: decision; semantic choice; applicability; scalar radius policy; units; numeric example; tolerance; reviewer identity; ISO date; future tests-first runtime authorization status.
+
+| Field | Current value |
+|---|---|
+| decision | decision: `approved | rejected | deferred`; current decision: `deferred` |
+| semantic choice | `geometric_scalar_L_over_r_quantity_only` if a later reviewer approves it; currently deferred |
+| applicability | two-node member endpoint length only; quantity-only, non-compliance evidence only |
+| scalar radius policy | existing scalar `section.radius_of_gyration` as `r` is not accepted yet; governing-axis implications remain unresolved |
+| units | L in m, scalar r in m, output dimensionless |
+| formula if approved | `L/r = two-node member length / existing scalar section.radius_of_gyration` |
+| numeric example | missing reviewer-owned numeric example |
+| tolerance | missing reviewer-owned tolerance and tolerance rationale |
+| reviewer identity | missing reviewer identity |
+| ISO date | missing ISO date |
+| future tests-first runtime authorization status | deferred; no runtime `L/r` computation is authorized |
+
+Deferred authorization reason: missing reviewer identity, ISO date, numeric example, and tolerance. While the decision is `deferred`, this packet does not authorize runtime `L/r`, does not authorize schema expansion, does not authorize pass/fail, does not authorize ASCE limits, does not authorize effective `K·L/r`, does not authorize Euler or column capacity, does not authorize optimizer feasibility, does not authorize runtime `civil-rag`, and does not authorize final-design claims.
+
 ## Approved runtime rule: `example_09_self_weight_nodal_distribution_gate`
 
 Status: approved narrow runtime rule for `LOAD-SW-DIST-001` only.

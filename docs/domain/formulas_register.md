@@ -148,6 +148,16 @@ The prior source-retrieval blocker is retrieval resolved for ASCE 10-15 evidence
 
 Capacity-related excerpts are excluded evidence boundaries only. Retrieved mentions of Euler behavior, `Fa`, compression stress formulas, column capacity, design strength, or appendix numeric fragments may be cited as boundary evidence, but they are not acceptance fixtures and must not become executable checks.
 
+#### `CHK-SLENDERNESS-001` geometric `L/r` authorization formula boundary
+
+This formula-register packet is documentation-only. Required packet fields are decision; semantic choice; applicability; scalar radius policy; units; numeric example; tolerance; reviewer identity; ISO date; and future tests-first runtime authorization status.
+
+The runtime authorization decision is decision: `approved | rejected | deferred`; current decision: `deferred`. Because the packet is deferred due to missing reviewer identity, ISO date, numeric example, and tolerance, no runtime `L/r` computation is authorized.
+
+If a later reviewer approves the packet, the only candidate quantity formula is `L/r = two-node member length / existing scalar section.radius_of_gyration`, with `L in m, scalar r in m, output dimensionless`, and semantic choice `geometric_scalar_L_over_r_quantity_only`. The scalar radius policy must explicitly accept or reject the existing scalar `section.radius_of_gyration` as `r` and record governing-axis implications before implementation.
+
+Boundary: this packet does not authorize runtime `L/r`, does not authorize schema expansion, does not authorize pass/fail, does not authorize ASCE limits, does not authorize effective `K·L/r`, does not authorize Euler or column capacity, does not authorize optimizer feasibility, does not authorize runtime `civil-rag`, and does not authorize final-design claims.
+
 ## Source-to-test traceability convention
 
 - Formula/register IDs must appear in tests and report traces once formulas exist.

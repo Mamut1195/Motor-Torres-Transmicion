@@ -81,6 +81,29 @@ The required answer packet must include semantic choice; exact source title/edit
 
 Until all rows are resolved, `CHK-SLENDERNESS-001` stays `TODO_DOMAIN_VALIDATION` and blocked for source, schema, CLI, tests, reports, optimizer feasibility, and runtime behavior.
 
+### `CHK-SLENDERNESS-001` geometric `L/r` runtime authorization packet questions
+
+Current decision: `deferred`. The packet decision must be recorded as decision: `approved | rejected | deferred`; until approval is complete, no runtime `L/r` computation is authorized.
+
+Required packet fields to resolve before a future tests-first runtime slice: decision; semantic choice; applicability; scalar radius policy; units; numeric example; tolerance; reviewer identity; ISO date; and future tests-first runtime authorization status.
+
+Open resolution items:
+
+| Packet item | Required reviewer answer | Current status |
+|---|---|---|
+| semantic choice | Whether a future rule may be `geometric_scalar_L_over_r_quantity_only` | deferred |
+| applicability | Whether two-node member endpoint length only is acceptable for a quantity-only, non-compliance value | deferred |
+| scalar radius policy | Whether existing scalar `section.radius_of_gyration` may be used as `r`, including governing-axis implications | deferred |
+| units | Confirm `L in m, scalar r in m, output dimensionless` | deferred |
+| formula if approved | Confirm `L/r = two-node member length / existing scalar section.radius_of_gyration` | deferred |
+| numeric example | Provide reviewer-owned inputs, substitutions, and expected dimensionless value | missing |
+| tolerance | Provide software-comparison tolerance and tolerance rationale | missing |
+| reviewer identity | Record human reviewer identity | missing |
+| ISO date | Record ISO date for the complete packet | missing |
+| future tests-first runtime authorization status | Approve, reject, or defer a later tests-first runtime SDD | deferred |
+
+Deferred reason: missing reviewer identity, ISO date, numeric example, and tolerance. This packet does not authorize runtime `L/r`, does not authorize schema expansion, does not authorize pass/fail, does not authorize ASCE limits, does not authorize effective `K·L/r`, does not authorize Euler or column capacity, does not authorize optimizer feasibility, does not authorize runtime `civil-rag`, and does not authorize final-design claims.
+
 ## Optimization Questions
 
 | ID | Question | Blocks Implementation? | Owner / Resolution Path | Current Status |
